@@ -129,3 +129,18 @@ struct Sphere {
 	Vector3Array center;
 	float radius;
 };
+
+struct Line {
+	Vector3Array origin;
+	Vector3Array diff;
+};
+
+struct Ray {
+	Vector3Array origin;
+	Vector3Array diff;
+};
+
+struct Segment {
+	Vector3Array origin;
+	Vector3Array diff;
+};
