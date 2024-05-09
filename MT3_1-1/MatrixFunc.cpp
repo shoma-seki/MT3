@@ -1,0 +1,283 @@
+#include "MatrixFunc.h"
+
+Matrix4x4 Add(const Matrix4x4& m1, const Matrix4x4& m2) {
+	Matrix4x4 result{};
+	for (int i = 0; i < 4; ++i) {
+		for (int j = 0; j < 4; ++j) {
+			result.matrix[i][j] = m1.matrix[i][j] + m2.matrix[i][j];
+		}
+	}
+	return result;
+}
+
+Matrix4x4 Subtract(const Matrix4x4& m1, const Matrix4x4& m2) {
+	Matrix4x4 result{};
+	for (int i = 0; i < 4; ++i) {
+		for (int j = 0; j < 4; ++j) {
+			result.matrix[i][j] = m1.matrix[i][j] - m2.matrix[i][j];
+		}
+	}
+	return result;
+}
+
+Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2) {
+	Matrix4x4 result{};
+
+	for (int i = 0; i < 4; ++i) {
+		for (int j = 0; j < 4; ++j) {
+			result.matrix[i][j] = 0.0f;
+			for (int k = 0; k < 4; ++k) {
+				result.matrix[i][j] += m1.matrix[i][k] * m2.matrix[k][j];
+			}
+		}
+	}
+
+	return result;
+}
+
+Matrix4x4 inverse(const Matrix4x4& matrix) {
+	Matrix4x4 a = matrix;
+	Matrix4x4 result{};
+
+	float buf2 = 0.0f;
+	int n = 4;
+	int i = 0;
+	int j = 0;
+	int k = 0;
+
+
+	for (i = 0; i < n; i++) {
+		for (j = 0; j < n; j++) {
+			if (i == j) {
+				result.matrix[i][j] = 1.0f;
+			}
+			else {
+				result.matrix[i][j] = 0.0f;
+			}
+		}
+	}
+
+	for (i = 0; i < n; i++) {
+		buf2 = 1 / a.matrix[i][i];
+		for (j = 0; j < n; j++) {
+			a.matrix[i][j] *= buf2;
+			result.matrix[i][j] *= buf2;
+		}
+		for (j = 0; j < n; j++) {
+			if (i != j) {
+				buf2 = a.matrix[j][i];
+				for (k = 0; k < n; k++) {
+					a.matrix[j][k] -= a.matrix[i][k] * buf2;
+					result.matrix[j][k] -= result.matrix[i][k] * buf2;
+				}
+			}
+		}
+	}
+
+	return result;
+}
+
+Matrix4x4 Transpose(const Matrix4x4& m) {
+	Matrix4x4 result{};
+
+	for (int i = 0; i < 4; ++i) {
+		for (int j = 0; j < 4; ++j) {
+			result.matrix[i][j] = m.matrix[j][i];
+		}
+	}
+
+	return result;
+}
+
+Matrix4x4 MakeIdentityMatrix() {
+	Matrix4x4 result{};
+
+	for (int i = 0; i < 4; ++i) {
+		for (int j = 0; j < 4; ++j) {
+			if (i == j) {
+				result.matrix[i][j] = 1.0f;
+			}
+		}
+	}
+
+	return result;
+}
+
+Matrix4x4 MakeTranslateMatrix(const Vector3Array& translate) {
+	Matrix4x4 result = {
+		1.0f, 0.0f, 0.0f, 0.0f,
+		0.0f, 1.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 1.0f, 0.0f,
+		translate.vector3[0], translate.vector3[1], translate.vector3[2], 1.0f
+	};
+
+	return result;
+}
+
+Matrix4x4 MakeScaleMatrix(const Vector3Array& scale) {
+	Matrix4x4 result = {
+		scale.vector3[0], 0.0f, 0.0f, 0.0f,
+		0.0f, scale.vector3[1], 0.0f, 0.0f,
+		0.0f, 0.0f, scale.vector3[2], 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f
+	};
+
+	return result;
+}
+
+Matrix4x4 MakeRotateXMatrix(float radian) {
+	Matrix4x4 result{};
+
+	result = {
+				1,0,0,0,
+				0,std::cos(radian),std::sin(radian),0,
+				0,-std::sin(radian),std::cos(radian),0,
+				0,0,0,1
+	};
+
+	return result;
+}
+
+Matrix4x4 MakeRotateYMatrix(float radian) {
+	Matrix4x4 result{};
+
+	result = {
+				std::cos(radian),0,-std::sin(radian),0,
+				0,1,0,0,
+				std::sin(radian),0,std::cos(radian),0,
+				0,0,0,1
+	};
+
+	return result;
+}
+
+Matrix4x4 MakeRotateZMatrix(float radian) {
+	Matrix4x4 result{};
+
+	result = {
+				std::cos(radian),std::sin(radian),0,0,
+				-std::sin(radian),std::cos(radian),0,0,
+				0,0,1,0,
+				0,0,0,1
+	};
+
+	return result;
+}
+
+Matrix4x4 MakeAffineMatrix(const Vector3Array& scale, const Vector3Array& rotate, const Vector3Array& translate) {
+	Matrix4x4 result{};
+	Matrix4x4 rotateXMatrix = MakeRotateXMatrix(rotate.vector3[0]);
+	Matrix4x4 rotateYMatrix = MakeRotateYMatrix(rotate.vector3[1]);
+	Matrix4x4 rotateZMatrix = MakeRotateZMatrix(rotate.vector3[2]);
+	Matrix4x4 rotateXYZ = Multiply(rotateXMatrix, Multiply(rotateYMatrix, rotateZMatrix));
+
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 4; j++) {
+			if (j == 3) {
+				result.matrix[i][j] = 0.0f;
+			}
+			else {
+				result.matrix[i][j] = scale.vector3[i] * rotateXYZ.matrix[i][j];
+			}
+		}
+	}
+	for (int i = 0; i < 3; i++) {
+		result.matrix[3][i] = translate.vector3[i];
+	}
+	result.matrix[3][3] = 1.0f;
+
+	return result;
+}
+
+Vector3Array Transform(const Vector3Array& vector, const Matrix4x4& matrix) {
+	Vector3Array result{};
+	for (int i = 0; i < 3; i++) {
+		result.vector3[i] = vector.vector3[0] * matrix.matrix[0][i] +
+			vector.vector3[1] * matrix.matrix[1][i] + vector.vector3[2] * matrix.matrix[2][i] + matrix.matrix[3][i];
+	}
+	float w = vector.vector3[0] * matrix.matrix[0][3] +
+		vector.vector3[1] * matrix.matrix[1][3] + vector.vector3[2] * matrix.matrix[2][3] + matrix.matrix[3][3];
+	assert(w != 0.0f);
+	for (int i = 0; i < 3; i++) {
+		result.vector3[i] /= w;
+	}
+	return result;
+}
+
+Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farClip) {
+	Matrix4x4 result{};
+
+	result.matrix[0][0] = (1.0f / aspectRatio) * (1.0f / std::tan(fovY / 2));
+	result.matrix[0][1] = 0.0f;
+	result.matrix[0][2] = 0.0f;
+	result.matrix[0][3] = 0.0f;
+	result.matrix[1][0] = 0.0f;
+	result.matrix[1][1] = 1.0f / std::tan(fovY / 2);
+	result.matrix[1][2] = 0.0f;
+	result.matrix[1][3] = 0.0f;
+	result.matrix[2][0] = 0.0f;
+	result.matrix[2][1] = 0.0f;
+	result.matrix[2][2] = farClip / (farClip - nearClip);
+	result.matrix[2][3] = 1.0f;
+	result.matrix[3][0] = 0.0f;
+	result.matrix[3][1] = 0.0f;
+	result.matrix[3][2] = -nearClip * farClip / (farClip - nearClip);
+	result.matrix[3][3] = 0.0f;
+
+	return result;
+}
+
+Matrix4x4 MakeOrthographicMatrix(float left, float top, float right, float bottom, float nearClip, float farClip) {
+	Matrix4x4 result{};
+
+	result.matrix[0][0] = 2.0f / (right - left);
+	result.matrix[0][1] = 0.0f;
+	result.matrix[0][2] = 0.0f;
+	result.matrix[0][3] = 0.0f;
+	result.matrix[1][0] = 0.0f;
+	result.matrix[1][1] = 2.0f / (top - bottom);
+	result.matrix[1][2] = 0.0f;
+	result.matrix[1][3] = 0.0f;
+	result.matrix[2][0] = 0.0f;
+	result.matrix[2][1] = 0.0f;
+	result.matrix[2][2] = 1.0f / (farClip - nearClip);
+	result.matrix[2][3] = 0.0f;
+	result.matrix[3][0] = (left + right) / (left - right);
+	result.matrix[3][1] = (top + bottom) / (bottom - top);
+	result.matrix[3][2] = nearClip / (nearClip - farClip);
+	result.matrix[3][3] = 1.0f;
+
+	return result;
+}
+
+Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, float minDepth, float maxDepth) {
+	Matrix4x4 result{};
+
+	result.matrix[0][0] = width / 2.0f;
+	result.matrix[0][1] = 0.0f;
+	result.matrix[0][2] = 0.0f;
+	result.matrix[0][3] = 0.0f;
+	result.matrix[1][0] = 0.0f;
+	result.matrix[1][1] = -(height / 2.0f);
+	result.matrix[1][2] = 0.0f;
+	result.matrix[1][3] = 0.0f;
+	result.matrix[2][0] = 0.0f;
+	result.matrix[2][1] = 0.0f;
+	result.matrix[2][2] = maxDepth - minDepth;
+	result.matrix[2][3] = 0.0f;
+	result.matrix[3][0] = left + width / 2.0f;
+	result.matrix[3][1] = top + height / 2.0f;
+	result.matrix[3][2] = minDepth;
+	result.matrix[3][3] = 1.0f;
+
+	return result;
+}
+
+Vector3Array RenderingPipeline(const Vector3Array& local, const Matrix4x4& worldMatrix, const Camera3dData& camera, Vector3Array& worldPos) {
+	Vector3Array screen{};
+	Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(camera.viewMatrix, camera.projectionMatrix));
+	Vector3Array ndc = Transform(local, worldViewProjectionMatrix);
+	worldPos = ndc;
+	screen = Transform(ndc, camera.viewportMatrix);
+	return screen;
+}
