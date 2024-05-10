@@ -1,10 +1,12 @@
 #include <Novice.h>
 #include "MatrixFunc.h"
+#include "Functions.h"
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <time.h>
 #include <stdlib.h>
 #include "Camera3d.h"
+#include "ImGuiManager.h"
 
 
 const char kWindowTitle[] = "LC1A_17_セキ_ショウマ_タイトル";
@@ -26,6 +28,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	sphere.center = { 0,0,0 };
 	sphere.radius = 1;
 
+	Segment segment{ {-2.0f,-1.0f,0.0f},{3.0f,2.0f,2.0f} };
+	Vector3Array point{ -1.5f,0.6f,0.6f };
+	Vector3Array project{};
+	Vector3Array closestPoint{};
+	Matrix4x4 startWorldMatrix = MakeAffineMatrix({ 1,1,1 }, { 0,0,0 }, segment.origin);
+	Matrix4x4 endWorldMatrix = MakeAffineMatrix({ 1,1,1 }, { 0,0,0 }, segment.diff);
+	
+	project = Project(Subtract(point, segment.origin), segment.diff);
+	closestPoint = ClosestPoint(point, segment);
+
+	Sphere pointSphere{ point,0.01f };
+	Sphere closestPointSphere{ closestPoint,0.01f };
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
 		// フレームの開始
@@ -39,6 +53,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓更新処理ここから
 		///
 		camera->Update(keys);
+		Vector3Array start = RenderingPipeline(Vector3Array{}, startWorldMatrix, camera->GetCamera());
+		Vector3Array end = RenderingPipeline(Vector3Array{}, endWorldMatrix, camera->GetCamera());
 		///
 		/// ↑更新処理ここまで
 		///
@@ -48,13 +64,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 		DrawGrid(camera->GetCamera());
 		//DrawLine(camera->GetCamera());
-		DrawSphere(sphere, camera->GetCamera(), 0x000000FF, 32);
 		camera->DebugDraw();
+		Novice::DrawLine(int(start.v[0]), int(start.v[1]), int(end.v[0]), int(end.v[1]), 0xFFFFFFFF);
 
+		DrawSphere(pointSphere, camera->GetCamera(), RED, 10);
+		DrawSphere(closestPointSphere, camera->GetCamera(), BLACK, 10);
 		//imgui
 		ImGui::Begin("Sphere");
-		ImGui::SliderFloat3("center", sphere.center.vector3, -10.0f, 10.0f);
-		ImGui::SliderFloat("radius", &sphere.radius, 0.0f, 2.0f);
+		//ImGui::SliderFloat3("center", sphere.center.v, -10.0f, 10.0f);
+		//ImGui::SliderFloat("radius", &sphere.radius, 0.0f, 2.0f);
+		ImGui::InputFloat3("Point", point.v, "%0.3f", ImGuiInputTextFlags_ReadOnly);
+		ImGui::InputFloat3("SegmentOrigin", segment.origin.v, "%0.3f", ImGuiInputTextFlags_ReadOnly);
+		ImGui::InputFloat3("SegmentDiff", segment.diff.v, "%0.3f", ImGuiInputTextFlags_ReadOnly);
+		ImGui::InputFloat3("Project", project.v, "%0.3f", ImGuiInputTextFlags_ReadOnly);
 		ImGui::End();
 		///
 		/// ↑描画処理ここまで

@@ -113,14 +113,13 @@ Vector2Array NewNormalize(Vector2Array start, Vector2Array end) {
 	return result;
 }
 
-float Clamp(float n, float min, float max) {
+void Clamp(float& n, float min, float max) {
 	if (n > max) {
-		return max;
+		n = max;
 	}
 	if (n < min) {
-		return min;
+		n = min;
 	}
-	return n;
 }
 
 float isBoxCollisionBeta(
@@ -447,6 +446,22 @@ float GetRadian(float degree) {
 	return degree * (float(M_PI) / 180);
 }
 
+Vector3Array Project(const Vector3Array& v1, const Vector3Array& v2)
+{
+	Vector3Array result{};
+	Vector3Array v2UnitVector = Normalize(v2);
+	result = Multiply(Dot(v1, v2UnitVector), v2UnitVector);
+	return result;
+}
+
+Vector3Array ClosestPoint(const Vector3Array& point, const Segment& segment)
+{
+	float t = Dot(Subtract(point, segment.origin), Subtract(segment.diff, segment.origin)) / powf(Length(Subtract(segment.diff, segment.origin)), 2);
+	Clamp(t, 0, Length(segment.diff));
+	Vector3Array result = Add(segment.origin, Multiply(t, Subtract(segment.diff, segment.origin)));
+	return result;
+}
+
 Vector3Float Add(const Vector3Float& v1, const Vector3Float& v2) {
 	Vector3Float result{};
 	result.x = v1.x + v2.x;
@@ -473,25 +488,25 @@ Vector3Float Multiply(float scalar, const Vector3Float& v) {
 
 Vector3Array Add(const Vector3Array& v1, const Vector3Array& v2) {
 	Vector3Array result{};
-	result.vector3[0] = v1.vector3[0] + v2.vector3[0];
-	result.vector3[1] = v1.vector3[1] + v2.vector3[1];
-	result.vector3[2] = v1.vector3[2] + v2.vector3[2];
+	result.v[0] = v1.v[0] + v2.v[0];
+	result.v[1] = v1.v[1] + v2.v[1];
+	result.v[2] = v1.v[2] + v2.v[2];
 	return result;
 }
 
 Vector3Array Subtract(const Vector3Array& v1, const Vector3Array& v2) {
 	Vector3Array result{};
-	result.vector3[0] = v1.vector3[0] - v2.vector3[0];
-	result.vector3[1] = v1.vector3[1] - v2.vector3[1];
-	result.vector3[2] = v1.vector3[2] - v2.vector3[2];
+	result.v[0] = v1.v[0] - v2.v[0];
+	result.v[1] = v1.v[1] - v2.v[1];
+	result.v[2] = v1.v[2] - v2.v[2];
 	return result;
 }
 
 Vector3Array Multiply(float scalar, const Vector3Array& v) {
 	Vector3Array result{};
-	result.vector3[0] = scalar * v.vector3[0];
-	result.vector3[1] = scalar * v.vector3[1];
-	result.vector3[2] = scalar * v.vector3[2];
+	result.v[0] = scalar * v.v[0];
+	result.v[1] = scalar * v.v[1];
+	result.v[2] = scalar * v.v[2];
 	return result;
 }
 
@@ -503,13 +518,19 @@ float Dot(const Vector3Float& v1, const Vector3Float& v2) {
 
 float Dot(const Vector3Array& v1, const Vector3Array& v2) {
 	float result{};
-	result = v1.vector3[0] * v2.vector3[0] + v1.vector3[1] * v2.vector3[1] + v1.vector3[2] * v2.vector3[2];
+	result = v1.v[0] * v2.v[0] + v1.v[1] * v2.v[1] + v1.v[2] * v2.v[2];
 	return result;
 }
 
 float Length(const Vector3Float& v) {
 	float result{};
 	result = sqrtf((v.x * v.x) + (v.y * v.y) + (v.z * v.z));
+	return result;
+}
+
+float Length(const Vector3Array& v) {
+	float result{};
+	result = sqrtf((v.v[0] * v.v[0]) + (v.v[1] * v.v[1]) + (v.v[2] * v.v[2]));
 	return result;
 }
 
@@ -524,15 +545,26 @@ Vector3Float Normalize(const Vector3Float& v) {
 	return result;
 }
 
-Vector3Array Cross(const Vector3Array& v1, const Vector3Array& v2){
-	Vector3Array result;
-	result.vector3[0] = v1.vector3[1] * v2.vector3[2] - v1.vector3[2] * v2.vector3[1];
-	result.vector3[1] = v1.vector3[2] * v2.vector3[0] - v1.vector3[0] * v2.vector3[2];
-	result.vector3[2] = v1.vector3[0] * v2.vector3[1] - v1.vector3[1] * v2.vector3[0];
+Vector3Array Normalize(const Vector3Array& v) {
+	Vector3Array result{};
+	float length = Length(v);
+	if (length != 0) {
+		result.v[0] = v.v[0] / length;
+		result.v[1] = v.v[1] / length;
+		result.v[2] = v.v[2] / length;
+	}
 	return result;
 }
 
-Vector3Float Cross(const Vector3Float& v1, const Vector3Float& v2){
+Vector3Array Cross(const Vector3Array& v1, const Vector3Array& v2) {
+	Vector3Array result;
+	result.v[0] = v1.v[1] * v2.v[2] - v1.v[2] * v2.v[1];
+	result.v[1] = v1.v[2] * v2.v[0] - v1.v[0] * v2.v[2];
+	result.v[2] = v1.v[0] * v2.v[1] - v1.v[1] * v2.v[0];
+	return result;
+}
+
+Vector3Float Cross(const Vector3Float& v1, const Vector3Float& v2) {
 	Vector3Float result;
 	result.x = v1.y * v2.z - v1.z * v2.y;
 	result.y = v1.z * v2.x - v1.x * v2.z;
@@ -548,13 +580,13 @@ void VectorScreenPrintf(int x, int y, const Vector3Float& vector, const char* la
 }
 
 void VectorScreenPrintf(int x, int y, const Vector3Array& vector, const char* label) {
-	Novice::ScreenPrintf(x, y, "%0.2f", vector.vector3[0]);
-	Novice::ScreenPrintf(x + kColumnWidth, y, "%0.2f", vector.vector3[1]);
-	Novice::ScreenPrintf(x + kColumnWidth * 2, y, "%0.2f", vector.vector3[2]);
+	Novice::ScreenPrintf(x, y, "%0.2f", vector.v[0]);
+	Novice::ScreenPrintf(x + kColumnWidth, y, "%0.2f", vector.v[1]);
+	Novice::ScreenPrintf(x + kColumnWidth * 2, y, "%0.2f", vector.v[2]);
 	Novice::ScreenPrintf(x + kColumnWidth * 3, y, "%s", label);
 }
 
-void MatrixScreenPrintf(int x, int y, const Matrix4x4 matrix,const char* label) {
+void MatrixScreenPrintf(int x, int y, const Matrix4x4 matrix, const char* label) {
 	for (int row = 0; row < 4; ++row) {
 		for (int column = 0; column < 4; ++column) {
 			Novice::ScreenPrintf(

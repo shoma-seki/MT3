@@ -28,7 +28,7 @@ struct Vector2Float {
 };
 
 struct Vector3Array {
-	float vector3[3];
+	float v[3];
 };
 
 struct Vector3Float {

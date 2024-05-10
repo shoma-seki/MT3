@@ -107,7 +107,7 @@ Matrix4x4 MakeTranslateMatrix(const Vector3Array& translate) {
 		1.0f, 0.0f, 0.0f, 0.0f,
 		0.0f, 1.0f, 0.0f, 0.0f,
 		0.0f, 0.0f, 1.0f, 0.0f,
-		translate.vector3[0], translate.vector3[1], translate.vector3[2], 1.0f
+		translate.v[0], translate.v[1], translate.v[2], 1.0f
 	};
 
 	return result;
@@ -115,9 +115,9 @@ Matrix4x4 MakeTranslateMatrix(const Vector3Array& translate) {
 
 Matrix4x4 MakeScaleMatrix(const Vector3Array& scale) {
 	Matrix4x4 result = {
-		scale.vector3[0], 0.0f, 0.0f, 0.0f,
-		0.0f, scale.vector3[1], 0.0f, 0.0f,
-		0.0f, 0.0f, scale.vector3[2], 0.0f,
+		scale.v[0], 0.0f, 0.0f, 0.0f,
+		0.0f, scale.v[1], 0.0f, 0.0f,
+		0.0f, 0.0f, scale.v[2], 0.0f,
 		0.0f, 0.0f, 0.0f, 1.0f
 	};
 
@@ -165,9 +165,9 @@ Matrix4x4 MakeRotateZMatrix(float radian) {
 
 Matrix4x4 MakeAffineMatrix(const Vector3Array& scale, const Vector3Array& rotate, const Vector3Array& translate) {
 	Matrix4x4 result{};
-	Matrix4x4 rotateXMatrix = MakeRotateXMatrix(rotate.vector3[0]);
-	Matrix4x4 rotateYMatrix = MakeRotateYMatrix(rotate.vector3[1]);
-	Matrix4x4 rotateZMatrix = MakeRotateZMatrix(rotate.vector3[2]);
+	Matrix4x4 rotateXMatrix = MakeRotateXMatrix(rotate.v[0]);
+	Matrix4x4 rotateYMatrix = MakeRotateYMatrix(rotate.v[1]);
+	Matrix4x4 rotateZMatrix = MakeRotateZMatrix(rotate.v[2]);
 	Matrix4x4 rotateXYZ = Multiply(rotateXMatrix, Multiply(rotateYMatrix, rotateZMatrix));
 
 	for (int i = 0; i < 3; i++) {
@@ -176,12 +176,12 @@ Matrix4x4 MakeAffineMatrix(const Vector3Array& scale, const Vector3Array& rotate
 				result.matrix[i][j] = 0.0f;
 			}
 			else {
-				result.matrix[i][j] = scale.vector3[i] * rotateXYZ.matrix[i][j];
+				result.matrix[i][j] = scale.v[i] * rotateXYZ.matrix[i][j];
 			}
 		}
 	}
 	for (int i = 0; i < 3; i++) {
-		result.matrix[3][i] = translate.vector3[i];
+		result.matrix[3][i] = translate.v[i];
 	}
 	result.matrix[3][3] = 1.0f;
 
@@ -191,14 +191,14 @@ Matrix4x4 MakeAffineMatrix(const Vector3Array& scale, const Vector3Array& rotate
 Vector3Array Transform(const Vector3Array& vector, const Matrix4x4& matrix) {
 	Vector3Array result{};
 	for (int i = 0; i < 3; i++) {
-		result.vector3[i] = vector.vector3[0] * matrix.matrix[0][i] +
-			vector.vector3[1] * matrix.matrix[1][i] + vector.vector3[2] * matrix.matrix[2][i] + matrix.matrix[3][i];
+		result.v[i] = vector.v[0] * matrix.matrix[0][i] +
+			vector.v[1] * matrix.matrix[1][i] + vector.v[2] * matrix.matrix[2][i] + matrix.matrix[3][i];
 	}
-	float w = vector.vector3[0] * matrix.matrix[0][3] +
-		vector.vector3[1] * matrix.matrix[1][3] + vector.vector3[2] * matrix.matrix[2][3] + matrix.matrix[3][3];
+	float w = vector.v[0] * matrix.matrix[0][3] +
+		vector.v[1] * matrix.matrix[1][3] + vector.v[2] * matrix.matrix[2][3] + matrix.matrix[3][3];
 	assert(w != 0.0f);
 	for (int i = 0; i < 3; i++) {
-		result.vector3[i] /= w;
+		result.v[i] /= w;
 	}
 	return result;
 }
@@ -299,17 +299,17 @@ void DrawSphere(const Sphere& sphere, const Camera3dData& camera, uint32_t color
 			Vector3Array screenC{};
 
 			//ワールド座標系でのa,b,cを求める
-			worldA.vector3[0] = sphere.radius * (std::cos(lat) * cos(lon)) + sphere.center.vector3[0];
-			worldA.vector3[1] = sphere.radius * (std::sin(lat)) + sphere.center.vector3[1];
-			worldA.vector3[2] = sphere.radius * (std::cos(lat)) * sin(lon) + sphere.center.vector3[2];
+			worldA.v[0] = sphere.radius * (std::cos(lat) * cos(lon)) + sphere.center.v[0];
+			worldA.v[1] = sphere.radius * (std::sin(lat)) + sphere.center.v[1];
+			worldA.v[2] = sphere.radius * (std::cos(lat)) * sin(lon) + sphere.center.v[2];
 
-			worldB.vector3[0] = sphere.radius * (std::cos(lat + thetaD) * cos(lon)) + sphere.center.vector3[0];
-			worldB.vector3[1] = sphere.radius * (std::sin(lat + thetaD)) + sphere.center.vector3[1];
-			worldB.vector3[2] = sphere.radius * (std::cos(lat + thetaD) * sin(lon)) + sphere.center.vector3[2];
+			worldB.v[0] = sphere.radius * (std::cos(lat + thetaD) * cos(lon)) + sphere.center.v[0];
+			worldB.v[1] = sphere.radius * (std::sin(lat + thetaD)) + sphere.center.v[1];
+			worldB.v[2] = sphere.radius * (std::cos(lat + thetaD) * sin(lon)) + sphere.center.v[2];
 
-			worldC.vector3[0] = sphere.radius * (std::cos(lat) * cos(lon + phiD)) + sphere.center.vector3[0];
-			worldC.vector3[1] = sphere.radius * (std::sin(lat)) + sphere.center.vector3[1];
-			worldC.vector3[2] = sphere.radius * (std::cos(lat) * sin(lon + phiD)) + sphere.center.vector3[2];
+			worldC.v[0] = sphere.radius * (std::cos(lat) * cos(lon + phiD)) + sphere.center.v[0];
+			worldC.v[1] = sphere.radius * (std::sin(lat)) + sphere.center.v[1];
+			worldC.v[2] = sphere.radius * (std::cos(lat) * sin(lon + phiD)) + sphere.center.v[2];
 
 			//ワールドマトリックス
 			Matrix4x4 aWorldMatrix = MakeAffineMatrix({ 1,1,1 }, { 0,0,0 }, worldA);
@@ -322,8 +322,8 @@ void DrawSphere(const Sphere& sphere, const Camera3dData& camera, uint32_t color
 			screenC = RenderingPipeline({ 0,0,0 }, cWorldMatrix, camera);
 
 			//線を引く
-			Novice::DrawLine(int(screenA.vector3[0]), int(screenA.vector3[1]), int(screenB.vector3[0]), int(screenB.vector3[1]), color);
-			Novice::DrawLine(int(screenA.vector3[0]), int(screenA.vector3[1]), int(screenC.vector3[0]), int(screenC.vector3[1]), color);
+			Novice::DrawLine(int(screenA.v[0]), int(screenA.v[1]), int(screenB.v[0]), int(screenB.v[1]), color);
+			Novice::DrawLine(int(screenA.v[0]), int(screenA.v[1]), int(screenC.v[0]), int(screenC.v[1]), color);
 		}
 	}
 }
@@ -342,62 +342,62 @@ void DrawGrid(const Camera3dData& camera) {
 	static Vector3Array translate = {};
 
 	for (uint32_t xIndex = 0; xIndex <= kSubdivision; ++xIndex) {
-		lineStartWorld.vector3[0] = xIndex * (kGridHalfWidth * 0.2f);
-		lineStartWorld.vector3[2] = 0.0f;
-		lineEndWorld.vector3[0] = lineStartWorld.vector3[0];
-		lineEndWorld.vector3[2] = kGridEvery * float(kSubdivision);
+		lineStartWorld.v[0] = xIndex * (kGridHalfWidth * 0.2f);
+		lineStartWorld.v[2] = 0.0f;
+		lineEndWorld.v[0] = lineStartWorld.v[0];
+		lineEndWorld.v[2] = kGridEvery * float(kSubdivision);
 
-		lineStartWorld.vector3[0] -= kGridEvery * float(kSubdivision / 2);
-		lineStartWorld.vector3[2] -= kGridEvery * float(kSubdivision / 2);
-		lineEndWorld.vector3[0] -= kGridEvery * float(kSubdivision / 2);
-		lineEndWorld.vector3[2] -= kGridEvery * float(kSubdivision / 2);
+		lineStartWorld.v[0] -= kGridEvery * float(kSubdivision / 2);
+		lineStartWorld.v[2] -= kGridEvery * float(kSubdivision / 2);
+		lineEndWorld.v[0] -= kGridEvery * float(kSubdivision / 2);
+		lineEndWorld.v[2] -= kGridEvery * float(kSubdivision / 2);
 
 		lineWorldMatrix = MakeAffineMatrix({ 1,1,1 }, { 0,0,0 }, translate);
 		lineStartScreen = RenderingPipeline(lineStartWorld, lineWorldMatrix, camera);
 		lineEndScreen = RenderingPipeline(lineEndWorld, lineWorldMatrix, camera);
 
 		if (xIndex != kSubdivision / 2) {
-			Novice::DrawLine(int(lineStartScreen.vector3[0]), int(lineStartScreen.vector3[1]),
-				int(lineEndScreen.vector3[0]), int(lineEndScreen.vector3[1]),
+			Novice::DrawLine(int(lineStartScreen.v[0]), int(lineStartScreen.v[1]),
+				int(lineEndScreen.v[0]), int(lineEndScreen.v[1]),
 				0xAAAAAAFF);
 		}
 		else {
-			Novice::DrawLine(int(lineStartScreen.vector3[0]), int(lineStartScreen.vector3[1]),
-				int(lineEndScreen.vector3[0]), int(lineEndScreen.vector3[1]),
+			Novice::DrawLine(int(lineStartScreen.v[0]), int(lineStartScreen.v[1]),
+				int(lineEndScreen.v[0]), int(lineEndScreen.v[1]),
 				0x111111FF);
 		}
 	}
 
 	for (uint32_t zIndex = 0; zIndex <= kSubdivision; ++zIndex) {
-		lineStartWorld.vector3[0] = 0.0f;
-		lineStartWorld.vector3[2] = zIndex * (kGridHalfWidth * 0.2f);
-		lineEndWorld.vector3[0] = kGridEvery * float(kSubdivision);
-		lineEndWorld.vector3[2] = lineStartWorld.vector3[2];
+		lineStartWorld.v[0] = 0.0f;
+		lineStartWorld.v[2] = zIndex * (kGridHalfWidth * 0.2f);
+		lineEndWorld.v[0] = kGridEvery * float(kSubdivision);
+		lineEndWorld.v[2] = lineStartWorld.v[2];
 
-		lineStartWorld.vector3[0] -= kGridEvery * float(kSubdivision / 2);
-		lineStartWorld.vector3[2] -= kGridEvery * float(kSubdivision / 2);
-		lineEndWorld.vector3[0] -= kGridEvery * float(kSubdivision / 2);
-		lineEndWorld.vector3[2] -= kGridEvery * float(kSubdivision / 2);
+		lineStartWorld.v[0] -= kGridEvery * float(kSubdivision / 2);
+		lineStartWorld.v[2] -= kGridEvery * float(kSubdivision / 2);
+		lineEndWorld.v[0] -= kGridEvery * float(kSubdivision / 2);
+		lineEndWorld.v[2] -= kGridEvery * float(kSubdivision / 2);
 
 		lineWorldMatrix = MakeAffineMatrix({ 1,1,1 }, { 0,0,0 }, translate);
 		lineStartScreen = RenderingPipeline(lineStartWorld, lineWorldMatrix, camera);
 		lineEndScreen = RenderingPipeline(lineEndWorld, lineWorldMatrix, camera);
 
 		if (zIndex != kSubdivision / 2) {
-			Novice::DrawLine(int(lineStartScreen.vector3[0]), int(lineStartScreen.vector3[1]),
-				int(lineEndScreen.vector3[0]), int(lineEndScreen.vector3[1]),
+			Novice::DrawLine(int(lineStartScreen.v[0]), int(lineStartScreen.v[1]),
+				int(lineEndScreen.v[0]), int(lineEndScreen.v[1]),
 				0xAAAAAAFF);
 		}
 		else {
-			Novice::DrawLine(int(lineStartScreen.vector3[0]), int(lineStartScreen.vector3[1]),
-				int(lineEndScreen.vector3[0]), int(lineEndScreen.vector3[1]),
+			Novice::DrawLine(int(lineStartScreen.v[0]), int(lineStartScreen.v[1]),
+				int(lineEndScreen.v[0]), int(lineEndScreen.v[1]),
 				0x111111FF);
 		}
 	}
 
 	ImGui::Begin("Grid");
 
-	ImGui::DragFloat3("translate", translate.vector3, 0.1f, -100, 100);
+	ImGui::SliderFloat3("translate", translate.v, -10.0f, 10.0f);
 
 	ImGui::End();
 }
@@ -411,36 +411,36 @@ void DrawLine(const Camera3dData& camera) {
 
 	lineWorldMatrix = MakeAffineMatrix({ 1,1,1 }, { 0,0,0 }, { 0.0f,0.0f,0.0f });
 
-	lineStartWorld.vector3[0] = -100;
-	lineEndWorld.vector3[0] = 100;
+	lineStartWorld.v[0] = -100;
+	lineEndWorld.v[0] = 100;
 
 	lineStartScreen = RenderingPipeline(lineStartWorld, lineWorldMatrix, camera);
 	lineEndScreen = RenderingPipeline(lineEndWorld, lineWorldMatrix, camera);
-	Novice::DrawLine(int(lineStartScreen.vector3[0]), int(lineStartScreen.vector3[1]),
-		int(lineEndScreen.vector3[0]), int(lineEndScreen.vector3[1]),
+	Novice::DrawLine(int(lineStartScreen.v[0]), int(lineStartScreen.v[1]),
+		int(lineEndScreen.v[0]), int(lineEndScreen.v[1]),
 		RED);
 
-	lineStartWorld.vector3[0] = 0;
-	lineEndWorld.vector3[0] = 0;
-	lineStartWorld.vector3[1] = -100;
-	lineEndWorld.vector3[1] = 100;
+	lineStartWorld.v[0] = 0;
+	lineEndWorld.v[0] = 0;
+	lineStartWorld.v[1] = -100;
+	lineEndWorld.v[1] = 100;
 
 	lineStartScreen = RenderingPipeline(lineStartWorld, lineWorldMatrix, camera);
 	lineEndScreen = RenderingPipeline(lineEndWorld, lineWorldMatrix, camera);
-	Novice::DrawLine(int(lineStartScreen.vector3[0]), int(lineStartScreen.vector3[1]),
-		int(lineEndScreen.vector3[0]), int(lineEndScreen.vector3[1]),
+	Novice::DrawLine(int(lineStartScreen.v[0]), int(lineStartScreen.v[1]),
+		int(lineEndScreen.v[0]), int(lineEndScreen.v[1]),
 		RED);
 
-	lineStartWorld.vector3[0] = 0;
-	lineEndWorld.vector3[0] = 0;
-	lineStartWorld.vector3[1] = 0;
-	lineEndWorld.vector3[1] = 0;
-	lineStartWorld.vector3[2] = -100;
-	lineEndWorld.vector3[2] = 100;
+	lineStartWorld.v[0] = 0;
+	lineEndWorld.v[0] = 0;
+	lineStartWorld.v[1] = 0;
+	lineEndWorld.v[1] = 0;
+	lineStartWorld.v[2] = -100;
+	lineEndWorld.v[2] = 100;
 
 	lineStartScreen = RenderingPipeline(lineStartWorld, lineWorldMatrix, camera);
 	lineEndScreen = RenderingPipeline(lineEndWorld, lineWorldMatrix, camera);
-	Novice::DrawLine(int(lineStartScreen.vector3[0]), int(lineStartScreen.vector3[1]),
-		int(lineEndScreen.vector3[0]), int(lineEndScreen.vector3[1]),
+	Novice::DrawLine(int(lineStartScreen.v[0]), int(lineStartScreen.v[1]),
+		int(lineEndScreen.v[0]), int(lineEndScreen.v[1]),
 		RED);
 }

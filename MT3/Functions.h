@@ -40,6 +40,7 @@ Vector3Array Multiply(float scalar, const Vector3Array& v2);
 float Dot(const Vector3Float& v1, const Vector3Float& v2);
 float Dot(const Vector3Array& v1, const Vector3Array& v2);
 float Length(const Vector3Float& v);
+float Length(const Vector3Array& v);
 Vector3Float Normalize(const Vector3Float& v);
 Vector3Array Cross(const Vector3Array& v1, const Vector3Array& v2);
 Vector3Float Cross(const Vector3Float& v1, const Vector3Float& v2);
@@ -63,7 +64,7 @@ float GetDis(Vector2Array pos1, Vector2Array pos2);
 float GetDis(Vector2Float pos1, Vector2Float pos2);
 float Normalize(float startX, float startY, float endX, float endY, int n);
 Vector2Array NewNormalize(Vector2Array start, Vector2Array end);
-float Clamp(float n, float min, float max);
+void Clamp(float& n, float min, float max);
 float isBoxCollisionBeta(
 	float leftTopX1, float leftTopY1, float rightBottomX1, float rightBottomY1, float leftTopX2,
 	float leftTopY2, float rightBottomX2, float rightBottomY2);
@@ -93,3 +94,6 @@ void Easing(Vector2Array& pos, Vector2Array start, Vector2Array end, float t);
 Vector2Array RotateDirection(Vector2Array direction, float theta);
 int LinearInterpolation(int start, int end, float t);
 float GetRadian(float degree);
+Vector3Array Project(const Vector3Array& v1, const Vector3Array& v2);
+Vector3Array ClosestPoint(const Vector3Array& point, const Segment& segment);
+Vector3Array Normalize(const Vector3Array& v);
