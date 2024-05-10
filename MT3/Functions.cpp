@@ -556,6 +556,17 @@ Vector3Array Normalize(const Vector3Array& v) {
 	return result;
 }
 
+bool isCollision(const Sphere& s1, const Sphere& s2)
+{
+	float length = Length(Subtract(s1.center, s2.center));
+	if (length <= s1.radius + s2.radius) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
 Vector3Array Cross(const Vector3Array& v1, const Vector3Array& v2) {
 	Vector3Array result;
 	result.v[0] = v1.v[1] * v2.v[2] - v1.v[2] * v2.v[1];

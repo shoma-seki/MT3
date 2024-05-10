@@ -97,3 +97,4 @@ float GetRadian(float degree);
 Vector3Array Project(const Vector3Array& v1, const Vector3Array& v2);
 Vector3Array ClosestPoint(const Vector3Array& point, const Segment& segment);
 Vector3Array Normalize(const Vector3Array& v);
+bool isCollision(const Sphere& s1, const Sphere& s2);

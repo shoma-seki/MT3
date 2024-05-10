@@ -24,9 +24,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Camera3d* camera = new Camera3d({ 1.0f,1.0f,1.0f }, { 0.26f,0.0f,0.0f }, { 0.0f,1.9f,-6.49f });
 
-	Sphere sphere{};
-	sphere.center = { 0,0,0 };
-	sphere.radius = 1;
+	Sphere sphere1{};
+	sphere1.center = { 0,0,0 };
+	sphere1.radius = 1;
+	uint32_t color = 0xFFFFFFFF;
+
+	Sphere sphere2{};
+	sphere1.center = { 3,0,0 };
+	sphere1.radius = 2;
 
 	Segment segment{ {-2.0f,-1.0f,0.0f},{3.0f,2.0f,2.0f} };
 	Vector3Array point{ -1.5f,0.6f,0.6f };
@@ -65,18 +70,28 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		DrawGrid(camera->GetCamera());
 		//DrawLine(camera->GetCamera());
 		camera->DebugDraw();
-		Novice::DrawLine(int(start.v[0]), int(start.v[1]), int(end.v[0]), int(end.v[1]), 0xFFFFFFFF);
+		/*Novice::DrawLine(int(start.v[0]), int(start.v[1]), int(end.v[0]), int(end.v[1]), 0xFFFFFFFF);
 
 		DrawSphere(pointSphere, camera->GetCamera(), RED, 10);
-		DrawSphere(closestPointSphere, camera->GetCamera(), BLACK, 10);
+		DrawSphere(closestPointSphere, camera->GetCamera(), BLACK, 10);*/
+		color = 0xFFFFFFFF;
+		if (isCollision(sphere1, sphere2)) {
+			color = RED;
+		}
+
+		DrawSphere(sphere1, camera->GetCamera(), color, 10);
+		DrawSphere(sphere2, camera->GetCamera(), 0xFFFFFFFF, 10);
+
 		//imgui
 		ImGui::Begin("Sphere");
-		//ImGui::SliderFloat3("center", sphere.center.v, -10.0f, 10.0f);
-		//ImGui::SliderFloat("radius", &sphere.radius, 0.0f, 2.0f);
-		ImGui::InputFloat3("Point", point.v, "%0.3f", ImGuiInputTextFlags_ReadOnly);
+		ImGui::SliderFloat3("center1", sphere1.center.v, -10.0f, 10.0f);
+		ImGui::SliderFloat("radius1", &sphere1.radius, 0.01f, 2.0f);
+		ImGui::SliderFloat3("center2", sphere2.center.v, -10.0f, 10.0f);
+		ImGui::SliderFloat("radius2", &sphere2.radius, 0.01f, 2.0f);
+		/*ImGui::InputFloat3("Point", point.v, "%0.3f", ImGuiInputTextFlags_ReadOnly);
 		ImGui::InputFloat3("SegmentOrigin", segment.origin.v, "%0.3f", ImGuiInputTextFlags_ReadOnly);
 		ImGui::InputFloat3("SegmentDiff", segment.diff.v, "%0.3f", ImGuiInputTextFlags_ReadOnly);
-		ImGui::InputFloat3("Project", project.v, "%0.3f", ImGuiInputTextFlags_ReadOnly);
+		ImGui::InputFloat3("Project", project.v, "%0.3f", ImGuiInputTextFlags_ReadOnly);*/
 		ImGui::End();
 		///
 		/// ↑描画処理ここまで
