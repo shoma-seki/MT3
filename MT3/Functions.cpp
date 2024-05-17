@@ -567,6 +567,49 @@ bool isCollision(const Sphere& s1, const Sphere& s2)
 	}
 }
 
+bool isCollision(const Sphere& sphere, const Plane& plane)
+{
+	Vector3Array perpendicular = Normalize(Perpendicular(plane.normal));
+	float dis = fabsf(Dot(plane.normal, sphere.center) - plane.distance);
+	if (dis < sphere.radius) {
+		return true;
+	}
+	return false;
+}
+
+Vector3Array Perpendicular(const Vector3Array& vector)
+{
+	if (vector.v[0] != 0.0f || vector.v[1] != 0.0f) {
+		return { -vector.v[1],vector.v[0],0.0f };
+	}
+	return { 0.0f,-vector.v[2],vector.v[1] };
+}
+
+void DrawPlane(const Plane& plane, const Camera3dData& camera, uint32_t color)
+{
+	Vector3Array center = Multiply(plane.distance, plane.normal);
+	Vector3Array perpendiculars[4];
+	perpendiculars[0] = Normalize(Perpendicular(plane.normal));
+	perpendiculars[1] = { -perpendiculars[0].v[0], -perpendiculars[0].v[1], -perpendiculars[0].v[2] };
+	perpendiculars[2] = Cross(plane.normal, perpendiculars[0]);
+	perpendiculars[3] = { -perpendiculars[2].v[0], -perpendiculars[2].v[1], -perpendiculars[2].v[2] };
+
+	Vector3Array points[4];
+	for (int32_t index = 0; index < 4; ++index) {
+		Vector3Array extend = Multiply(2.0f, perpendiculars[index]);
+		Vector3Array point = Add(center, extend);
+		Matrix4x4 worldMatrix = MakeAffineMatrix({ 1,1,1 }, { 0,0,0 }, point);
+		points[index] = RenderingPipeline({ 0,0,0 }, worldMatrix, camera);
+	}
+	for (int i = 0; i < 4; i++) {
+		Novice::DrawLine(int(points[0].v[0]), int(points[0].v[1]), int(points[2].v[0]), int(points[2].v[1]), color);
+		Novice::DrawLine(int(points[1].v[0]), int(points[1].v[1]), int(points[2].v[0]), int(points[2].v[1]), color);
+		Novice::DrawLine(int(points[1].v[0]), int(points[1].v[1]), int(points[3].v[0]), int(points[3].v[1]), color);
+		Novice::DrawLine(int(points[3].v[0]), int(points[3].v[1]), int(points[0].v[0]), int(points[0].v[1]), color);
+		Novice::ScreenPrintf(int(points[i].v[0]), int(points[i].v[1]), "%d", i);
+	}
+}
+
 Vector3Array Cross(const Vector3Array& v1, const Vector3Array& v2) {
 	Vector3Array result;
 	result.v[0] = v1.v[1] * v2.v[2] - v1.v[2] * v2.v[1];

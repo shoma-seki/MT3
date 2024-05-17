@@ -144,3 +144,8 @@ struct Segment {
 	Vector3Array origin;
 	Vector3Array diff;
 };
+
+struct Plane {
+	Vector3Array normal;
+	float distance;
+};

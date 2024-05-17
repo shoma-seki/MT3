@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <math.h>
+#include "MatrixFunc.h"
 
 const int MapSizeX = 80;
 const int MapSizeY = 44;
@@ -98,3 +99,6 @@ Vector3Array Project(const Vector3Array& v1, const Vector3Array& v2);
 Vector3Array ClosestPoint(const Vector3Array& point, const Segment& segment);
 Vector3Array Normalize(const Vector3Array& v);
 bool isCollision(const Sphere& s1, const Sphere& s2);
+bool isCollision(const Sphere& sphere, const Plane& plane);
+Vector3Array Perpendicular(const Vector3Array& vector);
+void DrawPlane(const Plane& plane, const Camera3dData& camera, uint32_t color);
