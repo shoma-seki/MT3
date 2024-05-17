@@ -24,20 +24,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Camera3d* camera = new Camera3d({ 1.0f,1.0f,1.0f }, { 0.26f,0.0f,0.0f }, { 0.0f,1.9f,-6.49f });
 
-	Sphere sphere1{};
+	/*Sphere sphere1{};
 	sphere1.center = { 0,0,0 };
 	sphere1.radius = 1;
 
-	/*Sphere sphere2{};
+	Sphere sphere2{};
 	sphere1.center = { 3,0,0 };
-	sphere1.radius = 2;
+	sphere1.radius = 2;*/
 
 	Segment segment{ {-2.0f,-1.0f,0.0f},{3.0f,2.0f,2.0f} };
-	Vector3Array point{ -1.5f,0.6f,0.6f };
+	/*Vector3Array point{ -1.5f,0.6f,0.6f };
 	Vector3Array project{};
 	Vector3Array closestPoint{};
-	Matrix4x4 startWorldMatrix = MakeAffineMatrix({ 1,1,1 }, { 0,0,0 }, segment.origin);
-	Matrix4x4 endWorldMatrix = MakeAffineMatrix({ 1,1,1 }, { 0,0,0 }, segment.diff);
 
 	project = Project(Subtract(point, segment.origin), segment.diff);
 	closestPoint = ClosestPoint(point, segment);
@@ -63,10 +61,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓更新処理ここから
 		///
 		camera->Update(keys);
-		/*Vector3Array start = RenderingPipeline(Vector3Array{}, startWorldMatrix, camera->GetCamera());
-		Vector3Array end = RenderingPipeline(Vector3Array{}, endWorldMatrix, camera->GetCamera());*/
+		Matrix4x4 startWorldMatrix = MakeAffineMatrix({ 1,1,1 }, { 0,0,0 }, segment.origin);
+		Matrix4x4 endWorldMatrix = MakeAffineMatrix({ 1,1,1 }, { 0,0,0 }, Add(segment.origin,segment.diff));
+		Vector3Array start = RenderingPipeline(Vector3Array{}, startWorldMatrix, camera->GetCamera());
+		Vector3Array end = RenderingPipeline(Vector3Array{}, endWorldMatrix, camera->GetCamera());
 		color = 0xFFFFFFFF;
-		if (isCollision(sphere1, plane)) {
+		if (isCollision(segment, plane)) {
 			color = 0xFF0000FF;
 		}
 		///
@@ -79,15 +79,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		DrawGrid(camera->GetCamera());
 		//DrawLine(camera->GetCamera());
 		camera->DebugDraw();
-		/*Novice::DrawLine(int(start.v[0]), int(start.v[1]), int(end.v[0]), int(end.v[1]), 0xFFFFFFFF);
+		Novice::DrawLine(int(start.v[0]), int(start.v[1]), int(end.v[0]), int(end.v[1]), color);
 
-		DrawSphere(pointSphere, camera->GetCamera(), RED, 10);
+		/*DrawSphere(pointSphere, camera->GetCamera(), RED, 10);
 		DrawSphere(closestPointSphere, camera->GetCamera(), BLACK, 10);*/
 		/*if (isCollision(sphere1, sphere2)) {
 			color = RED;
 		}*/
 
-		DrawSphere(sphere1, camera->GetCamera(), color, 36);
+		//DrawSphere(sphere1, camera->GetCamera(), color, 36);
 		/*DrawSphere(sphere2, camera->GetCamera(), 0xFFFFFFFF, 10); */
 
 		DrawPlane(plane, camera->GetCamera(), color);
@@ -95,10 +95,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//imgui
 		ImGui::Begin("Sphere");
 		ImGui::DragFloat3("PlaneNormal", plane.normal.v, 0.1f);
-		ImGui::DragFloat("PlaneNormal", &plane.distance, 0.1f);
+		ImGui::DragFloat("PlaneDistance", &plane.distance, 0.1f);
+		ImGui::DragFloat3("segmentOrigin", segment.origin.v, 0.1f);
+		ImGui::DragFloat3("segmentDiff", segment.diff.v, 0.1f);
 		plane.normal = Normalize(plane.normal);
-		ImGui::SliderFloat3("center1", sphere1.center.v, -10.0f, 10.0f);
-		ImGui::SliderFloat("radius1", &sphere1.radius, 0.01f, 2.0f);
+		/*ImGui::SliderFloat3("center1", sphere1.center.v, -10.0f, 10.0f);
+		ImGui::SliderFloat("radius1", &sphere1.radius, 0.01f, 2.0f);*/
 		/*ImGui::SliderFloat3("center2", sphere2.center.v, -10.0f, 10.0f);
 		ImGui::SliderFloat("radius2", &sphere2.radius, 0.01f, 2.0f);*/
 		/*ImGui::InputFloat3("Point", point.v, "%0.3f", ImGuiInputTextFlags_ReadOnly);

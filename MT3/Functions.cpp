@@ -577,6 +577,20 @@ bool isCollision(const Sphere& sphere, const Plane& plane)
 	return false;
 }
 
+bool isCollision(const Segment& segment, const Plane& plane)
+{
+	float dot = Dot(plane.normal, segment.diff);
+	if (dot == 0.0f) {
+		return false;
+	}
+	float t = (plane.distance - Dot(segment.origin, plane.normal)) / dot;
+	Novice::ScreenPrintf(0, 0, "%f", t);
+	if (t >= 1.0f || t <= 0.0f) {
+		return false;
+	}
+	return true;
+}
+
 Vector3Array Perpendicular(const Vector3Array& vector)
 {
 	if (vector.v[0] != 0.0f || vector.v[1] != 0.0f) {
