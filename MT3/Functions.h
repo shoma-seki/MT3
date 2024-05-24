@@ -101,5 +101,6 @@ Vector3Array Normalize(const Vector3Array& v);
 bool isCollision(const Sphere& s1, const Sphere& s2);
 bool isCollision(const Sphere& sphere, const Plane& plane);
 bool isCollision(const Segment& segment, const Plane& plane);
+bool isCollision(const Triangle& triangle, const Segment& segment);
 Vector3Array Perpendicular(const Vector3Array& vector);
 void DrawPlane(const Plane& plane, const Camera3dData& camera, uint32_t color);

@@ -20,9 +20,9 @@ void Camera3d::Update(char keys[]) {
 void Camera3d::DebugDraw() {
 	ImGui::Begin("window");
 
-	ImGui::DragFloat3("scale", &camera_.scale.v[0], 0.1f, 0, 2);
-	ImGui::DragFloat3("rotate", &camera_.rotate.v[0], 0.01f, -1, 1);
-	ImGui::DragFloat3("translate", &camera_.translate.v[0], 0.1f, -1000, 1000);
+	ImGui::DragFloat3("scale", &camera_.scale.v[0], 0.1f);
+	ImGui::DragFloat3("rotate", &camera_.rotate.v[0], 0.01f);
+	ImGui::DragFloat3("translate", &camera_.translate.v[0], 0.1f);
 
 	ImGui::End();
 }

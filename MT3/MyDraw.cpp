@@ -4,8 +4,13 @@ void MyDrawTriangle(const Vector3Array& screenPos1, const Vector3Array& screenPo
 	Novice::DrawTriangle(int(screenPos1.v[0]), int(screenPos1.v[1]),
 		int(screenPos2.v[0]), int(screenPos2.v[1]),
 		int(screenPos3.v[0]), int(screenPos3.v[1]),
-		color, kFillModeSolid
+		color, kFillModeWireFrame
 		);
+}
+
+void MyDrawTriangle(const Triangle& triangle,const unsigned int color)
+{
+	MyDrawTriangle(triangle.pos[0].screen, triangle.pos[1].screen, triangle.pos[2].screen, color);
 }
 
 void MyDrawQuad(const Object& obj, Vector2Array imageSize, int GH, unsigned int color) {

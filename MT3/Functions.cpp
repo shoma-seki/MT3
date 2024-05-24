@@ -584,11 +584,39 @@ bool isCollision(const Segment& segment, const Plane& plane)
 		return false;
 	}
 	float t = (plane.distance - Dot(segment.origin, plane.normal)) / dot;
-	Novice::ScreenPrintf(0, 0, "%f", t);
+	//Novice::ScreenPrintf(0, 0, "%f", t);
 	if (t >= 1.0f || t <= 0.0f) {
 		return false;
 	}
 	return true;
+}
+
+bool isCollision(const Triangle& triangle, const Segment& segment)
+{
+	Vector3Array v01 = Subtract(triangle.worldPos[1], triangle.worldPos[0]);
+	Vector3Array v12 = Subtract(triangle.worldPos[2], triangle.worldPos[1]);
+	Vector3Array n = Normalize(Cross(v01, v12));
+	//float t = (Dot(triangle.worldPos[0], n) - Dot(segment.origin, n)) / dot;
+	float t = Dot(triangle.worldPos[0], n) - Dot(segment.origin, n) / Dot(segment.diff, n);
+	Novice::ScreenPrintf(0, 0, "%f", t);
+	Vector3Array p = Add(segment.origin, Multiply(t, segment.diff));
+
+	Vector3Array v20 = Subtract(triangle.worldPos[0], triangle.worldPos[2]);
+	Vector3Array v0p = Subtract(p, triangle.worldPos[0]);
+	Vector3Array v1p = Subtract(p, triangle.worldPos[1]);
+	Vector3Array v2p = Subtract(p, triangle.worldPos[2]);
+
+	Vector3Array cross01 = Cross(v01, v1p);
+	Vector3Array cross12 = Cross(v12, v2p);
+	Vector3Array cross20 = Cross(v20, v0p);
+
+	if (Dot(cross01, n) >= 0.0f &&
+		Dot(cross12, n) >= 0.0f &&
+		Dot(cross20, n) >= 0.0f) {
+		return true;
+	}
+
+	return false;
 }
 
 Vector3Array Perpendicular(const Vector3Array& vector)

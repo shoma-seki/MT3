@@ -280,6 +280,17 @@ Vector3Array RenderingPipeline(const Vector3Array& local, const Matrix4x4& world
 	return screen;
 }
 
+void RenderingPipeline(Triangle& triangle, const Camera3dData& camera)
+{
+	triangle.worldMatrix = MakeAffineMatrix(triangle.scale, triangle.rotate, triangle.translate);
+	for (int i = 0; i < 3; i++) {
+		triangle.pos[i].screen = RenderingPipeline(triangle.pos[i].local, triangle.worldMatrix, camera);
+		Matrix4x4 worldViewProjectionMatrix = Multiply(triangle.worldMatrix, Multiply(camera.viewMatrix, camera.projectionMatrix));
+		triangle.worldPos[i] = Transform(triangle.pos[i].local, triangle.worldMatrix);
+		Novice::ScreenPrintf(0, 30 + 15 * i, "%f", triangle.worldPos[i].v[0]);
+	}
+}
+
 void DrawSphere(const Sphere& sphere, const Camera3dData& camera, uint32_t color, uint32_t subdivision) {
 	const uint32_t kSubdivision = subdivision;
 	const float kLonEvery = float(2.0 * M_PI / kSubdivision);//phi
