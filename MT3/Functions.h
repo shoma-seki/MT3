@@ -105,5 +105,6 @@ bool isCollision(const Segment& segment, const Plane& plane);
 bool isCollision(const Triangle& triangle, const Segment& segment);
 bool isCollision(const AABB& a, const AABB& b);
 bool isCollision(const AABB& aabb, const Sphere& sphere);
+bool isCollision(const AABB& aabb, const Segment& segment);
 Vector3Array Perpendicular(const Vector3Array& vector);
 void DrawPlane(const Plane& plane, const Camera3dData& camera, uint32_t color);

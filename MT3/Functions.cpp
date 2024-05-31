@@ -633,10 +633,34 @@ bool isCollision(const AABB& a, const AABB& b)
 bool isCollision(const AABB& aabb, const Sphere& sphere)
 {
 	Vector3Array closestPoint{ std::clamp(sphere.center.v[0],aabb.min.v[0],aabb.max.v[0]),
-	std::clamp(sphere.center.v[1],aabb.min.v[1],aabb.max.v[1]), 
-	std::clamp(sphere.center.v[2],aabb.min.v[2],aabb.max.v[2])};
+	std::clamp(sphere.center.v[1],aabb.min.v[1],aabb.max.v[1]),
+	std::clamp(sphere.center.v[2],aabb.min.v[2],aabb.max.v[2]) };
 	float distance = Length(Subtract(closestPoint, sphere.center));
 	if (distance <= sphere.radius) {
+		return true;
+	}
+	return false;
+}
+
+bool isCollision(const AABB& aabb, const Segment& segment)
+{
+	float txMin = (aabb.min.v[0] - segment.origin.v[0]) / segment.diff.v[0];
+	float txMax = (aabb.max.v[0] - segment.origin.v[0]) / segment.diff.v[0];
+	float tyMin = (aabb.min.v[1] - segment.origin.v[1]) / segment.diff.v[1];
+	float tyMax = (aabb.max.v[1] - segment.origin.v[1]) / segment.diff.v[1];
+	float tzMin = (aabb.min.v[2] - segment.origin.v[2]) / segment.diff.v[2];
+	float tzMax = (aabb.max.v[2] - segment.origin.v[2]) / segment.diff.v[2];
+
+	float tNearX = min(txMin, txMax);
+	float tNearY = min(tyMin, tyMax);
+	float tNearZ = min(tzMin, tzMax);
+	float tFarX = max(txMin, txMax);
+	float tFarY = max(tyMin, tyMax);
+	float tFarZ = max(tzMin, tzMax);
+
+	float tmin = max(max(tNearX, tNearY), tNearZ);
+	float tmax = min(min(tFarX, tFarY), tFarZ);
+	if (tmin <= tmax) {
 		return true;
 	}
 	return false;
