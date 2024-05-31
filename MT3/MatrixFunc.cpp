@@ -280,6 +280,13 @@ Vector3Array RenderingPipeline(const Vector3Array& local, const Matrix4x4& world
 	return screen;
 }
 
+Vector3Array RenderingPipeline(const Vector3Array& local, const Vector3Array& translate, const Camera3dData& camera)
+{
+	Matrix4x4 worldMatrix = MakeAffineMatrix({ 1,1,1 }, { 0,0,0 }, translate);
+	Vector3Array result = RenderingPipeline(local, worldMatrix, camera);
+	return result;
+}
+
 void RenderingPipeline(Triangle& triangle, const Camera3dData& camera)
 {
 	triangle.worldMatrix = MakeAffineMatrix(triangle.scale, triangle.rotate, triangle.translate);
@@ -454,4 +461,63 @@ void DrawLine(const Camera3dData& camera) {
 	Novice::DrawLine(int(lineStartScreen.v[0]), int(lineStartScreen.v[1]),
 		int(lineEndScreen.v[0]), int(lineEndScreen.v[1]),
 		RED);
+}
+
+void DrawLine(const Vector3Array& p1, const Vector3Array& p2, const Camera3dData& camera, uint32_t color)
+{
+	Vector3Array screenP1 = RenderingPipeline({ 0,0,0 }, p1, camera);
+	Vector3Array screenP2 = RenderingPipeline({ 0,0,0 }, p2, camera);
+	Novice::DrawLine(int(screenP1.v[0]), int(screenP1.v[1]), int(screenP2.v[0]), int(screenP2.v[1]), color);
+}
+
+void DrawAABB(const AABB& aabb, const Camera3dData& camera, uint32_t color)
+{
+	Vector3Array point[8] = {};
+
+	point[0] = aabb.min;
+	point[7] = aabb.max;
+
+	point[1].v[0] = aabb.min.v[0];
+	point[1].v[1] = aabb.min.v[1];
+	point[1].v[2] = aabb.max.v[2];
+
+	point[2].v[0] = aabb.min.v[0];
+	point[2].v[1] = aabb.max.v[1];
+	point[2].v[2] = aabb.min.v[2];
+
+	point[3].v[0] = aabb.min.v[0];
+	point[3].v[1] = aabb.max.v[1];
+	point[3].v[2] = aabb.max.v[2];
+
+	point[4].v[0] = aabb.max.v[0];
+	point[4].v[1] = aabb.min.v[1];
+	point[4].v[2] = aabb.min.v[2];
+
+	point[5].v[0] = aabb.max.v[0];
+	point[5].v[1] = aabb.min.v[1];
+	point[5].v[2] = aabb.max.v[2];
+
+	point[6].v[0] = aabb.max.v[0];
+	point[6].v[1] = aabb.max.v[1];
+	point[6].v[2] = aabb.min.v[2];
+
+	DrawLine(point[0], point[1], camera, color);
+	DrawLine(point[1], point[3], camera, color);
+	DrawLine(point[3], point[2], camera, color);
+	DrawLine(point[0], point[2], camera, color);
+
+	DrawLine(point[4], point[5], camera, color);
+	DrawLine(point[5], point[7], camera, color);
+	DrawLine(point[7], point[6], camera, color);
+	DrawLine(point[4], point[6], camera, color);
+
+	DrawLine(point[0], point[4], camera, color);
+	DrawLine(point[1], point[5], camera, color);
+	DrawLine(point[2], point[6], camera, color);
+	DrawLine(point[3], point[7], camera, color);
+
+	for (int i = 0; i < 8; i++) {
+		point[i] = RenderingPipeline({ 0,0,0 }, point[i], camera);
+		Novice::ScreenPrintf(int(point[i].v[0]), int(point[i].v[1]), "%d", i);
+	}
 }

@@ -619,6 +619,17 @@ bool isCollision(const Triangle& triangle, const Segment& segment)
 	return false;
 }
 
+bool isCollision(const AABB& a, const AABB& b)
+{
+	if ((a.min.v[0] <= b.max.v[0] && a.max.v[0] >= b.min.v[0]) &&
+		(a.min.v[1] <= b.max.v[1] && a.max.v[1] >= b.min.v[1]) &&
+		(a.min.v[2] <= b.max.v[2] && a.max.v[2] >= b.min.v[2]))
+	{
+		return true;
+	}
+	return false;
+}
+
 Vector3Array Perpendicular(const Vector3Array& vector)
 {
 	if (vector.v[0] != 0.0f || vector.v[1] != 0.0f) {

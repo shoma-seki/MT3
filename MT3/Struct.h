@@ -149,3 +149,8 @@ struct Plane {
 	Vector3Array normal;
 	float distance;
 };
+
+struct AABB {
+	Vector3Array min;
+	Vector3Array max;
+};

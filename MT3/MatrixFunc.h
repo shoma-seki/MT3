@@ -28,8 +28,11 @@ Matrix4x4 MakeOrthographicMatrix(float left, float top, float right, float botto
 Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, float minDepth, float maxDepth);
 
 Vector3Array RenderingPipeline(const Vector3Array& local, const Matrix4x4& worldMatrix, const Camera3dData& camera);
-void RenderingPipeline(Triangle& triangle,  const Camera3dData& camera);
+Vector3Array RenderingPipeline(const Vector3Array& local, const Vector3Array& translate, const Camera3dData& camera);
+void RenderingPipeline(Triangle& triangle, const Camera3dData& camera);
 
 void DrawSphere(const Sphere& sphere, const Camera3dData& camera, uint32_t color, uint32_t subdivision);
 void DrawGrid(const Camera3dData& camera);
 void DrawLine(const Camera3dData& camera);
+void DrawLine(const Vector3Array& p1, const Vector3Array& p2, const Camera3dData& camera, uint32_t color);
+void DrawAABB(const AABB& aabb, const Camera3dData& camera, uint32_t color);
