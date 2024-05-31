@@ -630,6 +630,18 @@ bool isCollision(const AABB& a, const AABB& b)
 	return false;
 }
 
+bool isCollision(const AABB& aabb, const Sphere& sphere)
+{
+	Vector3Array closestPoint{ std::clamp(sphere.center.v[0],aabb.min.v[0],aabb.max.v[0]),
+	std::clamp(sphere.center.v[1],aabb.min.v[1],aabb.max.v[1]), 
+	std::clamp(sphere.center.v[2],aabb.min.v[2],aabb.max.v[2])};
+	float distance = Length(Subtract(closestPoint, sphere.center));
+	if (distance <= sphere.radius) {
+		return true;
+	}
+	return false;
+}
+
 Vector3Array Perpendicular(const Vector3Array& vector)
 {
 	if (vector.v[0] != 0.0f || vector.v[1] != 0.0f) {

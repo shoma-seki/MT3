@@ -24,16 +24,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Camera3d* camera = new Camera3d({ 1.0f,1.0f,1.0f }, { 0.26f,0.0f,0.0f }, { 0.0f,1.9f,-6.49f });
 
-	/*Sphere sphere1{};
-	sphere1.center = { 0,0,0 };
-	sphere1.radius = 1;
+	Sphere sphere{};
+	sphere.center = { 0,0,0 };
+	sphere.radius = 1;
 
-	Sphere sphere2{};
+	/*Sphere sphere2{};
 	sphere1.center = { 3,0,0 };
-	sphere1.radius = 2;*/
+	sphere1.radius = 2;
 
-	//Segment segment{ {-2.0f,-1.0f,0.0f},{3.0f,2.0f,2.0f} };
-	/*Vector3Array point{ -1.5f,0.6f,0.6f };
+	Segment segment{ {-2.0f,-1.0f,0.0f},{3.0f,2.0f,2.0f} };
+	Vector3Array point{ -1.5f,0.6f,0.6f };
 	Vector3Array project{};
 	Vector3Array closestPoint{};
 
@@ -57,14 +57,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	plane.distance = Dot(triangle.worldPos[1],n);
 	plane.normal = n;*/
 
-	AABB aabb1 = {
+	AABB aabb = {
 	.min = {-0.5f,-0.5f,-0.5f},
 	.max = {0.0f,0.0f,0.0f},
-	};
-
-	AABB aabb2 = {
-	.min = {0.2f,0.2f,0.2f},
-	.max = {1.0f,1.0f,1.0f},
 	};
 
 	uint32_t color = 0xFFFFFFFF;
@@ -88,15 +83,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Vector3Array end = RenderingPipeline(Vector3Array{}, endWorldMatrix, camera->GetCamera());*/
 		color = 0xFFFFFFFF;
 
-		aabb1.min.v[0] = (std::min)(aabb1.min.v[0], aabb1.max.v[0]);
-		aabb1.min.v[1] = (std::min)(aabb1.min.v[1], aabb1.max.v[1]);
-		aabb1.min.v[2] = (std::min)(aabb1.min.v[2], aabb1.max.v[2]);
+		aabb.min.v[0] = (std::min)(aabb.min.v[0], aabb.max.v[0]);
+		aabb.min.v[1] = (std::min)(aabb.min.v[1], aabb.max.v[1]);
+		aabb.min.v[2] = (std::min)(aabb.min.v[2], aabb.max.v[2]);
 
-		aabb1.max.v[0] = (std::max)(aabb1.min.v[0], aabb1.max.v[0]);
-		aabb1.max.v[1] = (std::max)(aabb1.min.v[1], aabb1.max.v[1]);
-		aabb1.max.v[2] = (std::max)(aabb1.min.v[2], aabb1.max.v[2]);
-
-		if (isCollision(aabb1, aabb2)) {
+		if (isCollision(aabb, sphere)) {
 			color = RED;
 		}
 		/*v01 = Subtract(triangle.worldPos[1], triangle.worldPos[0]);
@@ -121,8 +112,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓描画処理ここから
 		///
 		DrawGrid(camera->GetCamera());
-		DrawAABB(aabb1, camera->GetCamera(), color);
-		DrawAABB(aabb2, camera->GetCamera(), color);
+		DrawAABB(aabb, camera->GetCamera(), color);
 		////DrawLine(camera->GetCamera());
 		camera->DebugDraw();
 		//Novice::DrawLine(int(start.v[0]), int(start.v[1]), int(end.v[0]), int(end.v[1]), color);
@@ -131,8 +121,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		//Novice::ScreenPrintf(0, 15, "%f", plane.distance);
 
-		/*DrawSphere(pointSphere, camera->GetCamera(), RED, 10);
-		DrawSphere(closestPointSphere, camera->GetCamera(), BLACK, 10);*/
+		DrawSphere(sphere, camera->GetCamera(), color, 10);
+		//DrawSphere(closestPointSphere, camera->GetCamera(), BLACK, 10);
 		/*if (isCollision(sphere1, sphere2)) {
 			color = RED;
 		}*/
@@ -144,10 +134,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		//imgui
 		ImGui::Begin("AABB");
-		ImGui::SliderFloat3("aabb1.min", aabb1.min.v, -10.0f, 10.0f);
-		ImGui::SliderFloat3("aabb1.max", aabb1.max.v, -10.0f, 10.0f);
-		ImGui::SliderFloat3("aabb2.min", aabb2.min.v, -10.0f, 10.0f);
-		ImGui::SliderFloat3("aabb2.max", aabb2.max.v, -10.0f, 10.0f);
+		ImGui::SliderFloat3("aabb1.min", aabb.min.v, -10.0f, 10.0f);
+		ImGui::SliderFloat3("aabb1.max", aabb.max.v, -10.0f, 10.0f);
 		ImGui::End();
 
 		ImGui::Begin("Segment");
@@ -156,8 +144,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/*ImGui::DragFloat3("segmentOrigin", segment.origin.v, 0.1f);
 		ImGui::DragFloat3("segmentDiff", segment.diff.v, 0.1f);*/
 		//plane.normal = Normalize(plane.normal);
-		/*ImGui::SliderFloat3("center1", sphere1.center.v, -10.0f, 10.0f);
-		ImGui::SliderFloat("radius1", &sphere1.radius, 0.01f, 2.0f);*/
+		ImGui::SliderFloat3("center1", sphere.center.v, -10.0f, 10.0f);
+		ImGui::SliderFloat("radius1", &sphere.radius, 0.01f, 2.0f);
 		/*ImGui::SliderFloat3("center2", sphere2.center.v, -10.0f, 10.0f);
 		ImGui::SliderFloat("radius2", &sphere2.radius, 0.01f, 2.0f);*/
 		/*ImGui::InputFloat3("Point", point.v, "%0.3f", ImGuiInputTextFlags_ReadOnly);

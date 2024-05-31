@@ -8,6 +8,7 @@
 #include <assert.h>
 #include <math.h>
 #include "MatrixFunc.h"
+#include <algorithm>
 
 const int MapSizeX = 80;
 const int MapSizeY = 44;
@@ -103,5 +104,6 @@ bool isCollision(const Sphere& sphere, const Plane& plane);
 bool isCollision(const Segment& segment, const Plane& plane);
 bool isCollision(const Triangle& triangle, const Segment& segment);
 bool isCollision(const AABB& a, const AABB& b);
+bool isCollision(const AABB& aabb, const Sphere& sphere);
 Vector3Array Perpendicular(const Vector3Array& vector);
 void DrawPlane(const Plane& plane, const Camera3dData& camera, uint32_t color);
