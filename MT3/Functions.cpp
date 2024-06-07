@@ -661,6 +661,41 @@ bool isCollision(const AABB& aabb, const Segment& segment)
 	float tmin = max(max(tNearX, tNearY), tNearZ);
 	float tmax = min(min(tFarX, tFarY), tFarZ);
 	if (tmin <= tmax) {
+		if ((segment.origin.v[0] < tNearX && segment.origin.v[0] + segment.diff.v[0] < tNearX) &&
+			(segment.origin.v[1] < tNearY && segment.origin.v[1] + segment.diff.v[1] < tNearY) &&
+			(segment.origin.v[2] < tNearZ && segment.origin.v[2] + segment.diff.v[2] < tNearZ))
+		{
+			return false;
+		}
+
+		if ((segment.origin.v[0] > tFarX && segment.origin.v[0] + segment.diff.v[0] > tFarX) &&
+			(segment.origin.v[1] > tFarY && segment.origin.v[1] + segment.diff.v[1] > tFarY) &&
+			(segment.origin.v[2] > tFarZ && segment.origin.v[2] + segment.diff.v[2] > tFarZ))
+		{
+			return false;
+		}
+
+		return true;
+	}
+	return false;
+}
+
+bool isCollision(const OBB& obb, const Sphere& sphere)
+{
+	Matrix4x4 worldMatrix = {
+		obb.orientations[0].v[0],obb.orientations[0].v[1],obb.orientations[0].v[2],0,
+		obb.orientations[1].v[0],obb.orientations[1].v[1],obb.orientations[1].v[2],0,
+		obb.orientations[2].v[0],obb.orientations[2].v[1],obb.orientations[2].v[2],0,
+		obb.center.v[0],obb.center.v[1],obb.center.v[2],1
+	};
+
+	Matrix4x4 obbWorldMatrixInverce = inverse(worldMatrix);
+
+	Vector3Array centerInOBBLocalSpace = Transform(sphere.center, obbWorldMatrixInverce);
+
+	AABB aabbOBBLocal{ .min = { -obb.size.v[0],-obb.size.v[1],-obb.size.v[2]},.max = obb.size };
+	Sphere sphereOBBLocal{ centerInOBBLocalSpace,sphere.radius };
+	if (isCollision(aabbOBBLocal, sphereOBBLocal)) {
 		return true;
 	}
 	return false;

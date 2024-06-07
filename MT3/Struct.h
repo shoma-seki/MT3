@@ -154,3 +154,9 @@ struct AABB {
 	Vector3Array min;
 	Vector3Array max;
 };
+
+struct OBB {
+	Vector3Array center;
+	Vector3Array orientations[3];
+	Vector3Array size;
+};

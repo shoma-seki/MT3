@@ -470,6 +470,11 @@ void DrawLine(const Vector3Array& p1, const Vector3Array& p2, const Camera3dData
 	Novice::DrawLine(int(screenP1.v[0]), int(screenP1.v[1]), int(screenP2.v[0]), int(screenP2.v[1]), color);
 }
 
+void DrawLine(const Vector3Array& p1, const Vector3Array& p2, uint32_t color)
+{
+	Novice::DrawLine(int(p1.v[0]), int(p1.v[1]), int(p2.v[0]), int(p2.v[1]), color);
+}
+
 void DrawAABB(const AABB& aabb, const Camera3dData& camera, uint32_t color)
 {
 	Vector3Array point[8] = {};
@@ -520,4 +525,69 @@ void DrawAABB(const AABB& aabb, const Camera3dData& camera, uint32_t color)
 		point[i] = RenderingPipeline({ 0,0,0 }, point[i], camera);
 		Novice::ScreenPrintf(int(point[i].v[0]), int(point[i].v[1]), "%d", i);
 	}
+}
+
+void DrawOBB(const OBB& obb, const Camera3dData& camera, uint32_t color)
+{
+	Vector3Array lPoint[8];
+
+	lPoint[0].v[0] = -obb.size.v[0];
+	lPoint[0].v[1] = -obb.size.v[1];
+	lPoint[0].v[2] = -obb.size.v[2];
+
+	lPoint[1].v[0] = -obb.size.v[0];
+	lPoint[1].v[1] = -obb.size.v[1];
+	lPoint[1].v[2] = +obb.size.v[2];
+
+	lPoint[2].v[0] = -obb.size.v[0];
+	lPoint[2].v[1] = +obb.size.v[1];
+	lPoint[2].v[2] = -obb.size.v[2];
+
+	lPoint[3].v[0] = -obb.size.v[0];
+	lPoint[3].v[1] = +obb.size.v[1];
+	lPoint[3].v[2] = +obb.size.v[2];
+
+	lPoint[4].v[0] = +obb.size.v[0];
+	lPoint[4].v[1] = -obb.size.v[1];
+	lPoint[4].v[2] = -obb.size.v[2];
+
+	lPoint[5].v[0] = +obb.size.v[0];
+	lPoint[5].v[1] = -obb.size.v[1];
+	lPoint[5].v[2] = +obb.size.v[2];
+
+	lPoint[6].v[0] = +obb.size.v[0];
+	lPoint[6].v[1] = +obb.size.v[1];
+	lPoint[6].v[2] = -obb.size.v[2];
+
+	lPoint[7].v[0] = +obb.size.v[0];
+	lPoint[7].v[1] = +obb.size.v[1];
+	lPoint[7].v[2] = +obb.size.v[2];
+
+	Matrix4x4 worldMatrix = {
+		obb.orientations[0].v[0],obb.orientations[0].v[1],obb.orientations[0].v[2],0,
+		obb.orientations[1].v[0],obb.orientations[1].v[1],obb.orientations[1].v[2],0,
+		obb.orientations[2].v[0],obb.orientations[2].v[1],obb.orientations[2].v[2],0,
+		obb.center.v[0],obb.center.v[1],obb.center.v[2],1
+	};
+
+	Vector3Array sPoint[8];
+
+	for (int i = 0; i < 8; i++) {
+		sPoint[i] = RenderingPipeline(lPoint[i], worldMatrix, camera);
+	}
+
+	DrawLine(sPoint[0], sPoint[1], color);
+	DrawLine(sPoint[1], sPoint[3], color);
+	DrawLine(sPoint[3], sPoint[2], color);
+	DrawLine(sPoint[0], sPoint[2], color);
+
+	DrawLine(sPoint[4], sPoint[5], color);
+	DrawLine(sPoint[5], sPoint[7], color);
+	DrawLine(sPoint[7], sPoint[6], color);
+	DrawLine(sPoint[4], sPoint[6], color);
+
+	DrawLine(sPoint[0], sPoint[4], color);
+	DrawLine(sPoint[1], sPoint[5], color);
+	DrawLine(sPoint[2], sPoint[6], color);
+	DrawLine(sPoint[3], sPoint[7], color);
 }

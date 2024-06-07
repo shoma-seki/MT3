@@ -35,4 +35,6 @@ void DrawSphere(const Sphere& sphere, const Camera3dData& camera, uint32_t color
 void DrawGrid(const Camera3dData& camera);
 void DrawLine(const Camera3dData& camera);
 void DrawLine(const Vector3Array& p1, const Vector3Array& p2, const Camera3dData& camera, uint32_t color);
+void DrawLine(const Vector3Array& p1, const Vector3Array& p2, uint32_t color);
 void DrawAABB(const AABB& aabb, const Camera3dData& camera, uint32_t color);
+void DrawOBB(const OBB& obb, const Camera3dData& camera, uint32_t color);
