@@ -701,6 +701,30 @@ bool isCollision(const OBB& obb, const Sphere& sphere)
 	return false;
 }
 
+bool isCollision(const OBB& obb, const Segment& segment)
+{
+	Matrix4x4 worldMatrix = {
+		   obb.orientations[0].v[0],obb.orientations[0].v[1],obb.orientations[0].v[2],0,
+		   obb.orientations[1].v[0],obb.orientations[1].v[1],obb.orientations[1].v[2],0,
+		   obb.orientations[2].v[0],obb.orientations[2].v[1],obb.orientations[2].v[2],0,
+		   obb.center.v[0],obb.center.v[1],obb.center.v[2],1
+	};
+
+	Matrix4x4 obbWorldMatrixInverce = inverse(worldMatrix);
+	Vector3Array loaclOrigin = Transform(segment.origin, obbWorldMatrixInverce);
+	Vector3Array localEnd = Transform(Add(segment.origin, segment.diff), obbWorldMatrixInverce);
+
+	AABB localAABB{
+		{-obb.size.v[0],-obb.size.v[1],-obb.size.v[2]},
+		{obb.size.v[0],obb.size.v[1],obb.size.v[2]},
+	};
+
+	Segment localLine;
+	localLine.origin = loaclOrigin;
+	localLine.diff = Subtract(localEnd, loaclOrigin);
+	return isCollision(localAABB, localLine);
+}
+
 Vector3Array Perpendicular(const Vector3Array& vector)
 {
 	if (vector.v[0] != 0.0f || vector.v[1] != 0.0f) {
