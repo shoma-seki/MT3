@@ -108,5 +108,10 @@ bool isCollision(const AABB& aabb, const Sphere& sphere);
 bool isCollision(const AABB& aabb, const Segment& segment);
 bool isCollision(const OBB& obb, const Sphere& sphere);
 bool isCollision(const OBB& obb, const Segment& segment);
+bool isCollision(const OBB& obb1, const OBB& obb2);
+
 Vector3Array Perpendicular(const Vector3Array& vector);
 void DrawPlane(const Plane& plane, const Camera3dData& camera, uint32_t color);
+void DrawBezier(const Vector3Array& controlPoint0, const Vector3Array& controlPoint1,
+	const Vector3Array& controlPoint2, const Camera3dData& camera, uint32_t color);
+Vector3Array Lerp(const Vector3Array& v1, const Vector3Array& v2, float t);

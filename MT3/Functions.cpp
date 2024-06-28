@@ -725,6 +725,150 @@ bool isCollision(const OBB& obb, const Segment& segment)
 	return isCollision(localAABB, localLine);
 }
 
+bool isCollision(const OBB& obb1, const OBB& obb2)
+{
+
+	Vector3Array lPoint1[8];
+
+	lPoint1[0].v[0] = -obb1.size.v[0];
+	lPoint1[0].v[1] = -obb1.size.v[1];
+	lPoint1[0].v[2] = -obb1.size.v[2];
+
+	lPoint1[1].v[0] = -obb1.size.v[0];
+	lPoint1[1].v[1] = -obb1.size.v[1];
+	lPoint1[1].v[2] = +obb1.size.v[2];
+
+	lPoint1[2].v[0] = -obb1.size.v[0];
+	lPoint1[2].v[1] = +obb1.size.v[1];
+	lPoint1[2].v[2] = -obb1.size.v[2];
+
+	lPoint1[3].v[0] = -obb1.size.v[0];
+	lPoint1[3].v[1] = +obb1.size.v[1];
+	lPoint1[3].v[2] = +obb1.size.v[2];
+
+	lPoint1[4].v[0] = +obb1.size.v[0];
+	lPoint1[4].v[1] = -obb1.size.v[1];
+	lPoint1[4].v[2] = -obb1.size.v[2];
+
+	lPoint1[5].v[0] = +obb1.size.v[0];
+	lPoint1[5].v[1] = -obb1.size.v[1];
+	lPoint1[5].v[2] = +obb1.size.v[2];
+
+	lPoint1[6].v[0] = +obb1.size.v[0];
+	lPoint1[6].v[1] = +obb1.size.v[1];
+	lPoint1[6].v[2] = -obb1.size.v[2];
+
+	lPoint1[7].v[0] = +obb1.size.v[0];
+	lPoint1[7].v[1] = +obb1.size.v[1];
+	lPoint1[7].v[2] = +obb1.size.v[2];
+
+	Vector3Array lPoint2[8];
+
+	lPoint2[0].v[0] = -obb2.size.v[0];
+	lPoint2[0].v[1] = -obb2.size.v[1];
+	lPoint2[0].v[2] = -obb2.size.v[2];
+
+	lPoint2[1].v[0] = -obb2.size.v[0];
+	lPoint2[1].v[1] = -obb2.size.v[1];
+	lPoint2[1].v[2] = +obb2.size.v[2];
+
+	lPoint2[2].v[0] = -obb2.size.v[0];
+	lPoint2[2].v[1] = +obb2.size.v[1];
+	lPoint2[2].v[2] = -obb2.size.v[2];
+
+	lPoint2[3].v[0] = -obb2.size.v[0];
+	lPoint2[3].v[1] = +obb2.size.v[1];
+	lPoint2[3].v[2] = +obb2.size.v[2];
+
+	lPoint2[4].v[0] = +obb2.size.v[0];
+	lPoint2[4].v[1] = -obb2.size.v[1];
+	lPoint2[4].v[2] = -obb2.size.v[2];
+
+	lPoint2[5].v[0] = +obb2.size.v[0];
+	lPoint2[5].v[1] = -obb2.size.v[1];
+	lPoint2[5].v[2] = +obb2.size.v[2];
+
+	lPoint2[6].v[0] = +obb2.size.v[0];
+	lPoint2[6].v[1] = +obb2.size.v[1];
+	lPoint2[6].v[2] = -obb2.size.v[2];
+
+	lPoint2[7].v[0] = +obb2.size.v[0];
+	lPoint2[7].v[1] = +obb2.size.v[1];
+	lPoint2[7].v[2] = +obb2.size.v[2];
+
+	Matrix4x4 worldMatrix1 = {
+		obb1.orientations[0].v[0],obb1.orientations[0].v[1],obb1.orientations[0].v[2],0,
+		obb1.orientations[1].v[0],obb1.orientations[1].v[1],obb1.orientations[1].v[2],0,
+		obb1.orientations[2].v[0],obb1.orientations[2].v[1],obb1.orientations[2].v[2],0,
+		obb1.center.v[0],obb1.center.v[1],obb1.center.v[2],1
+	};
+
+	Matrix4x4 worldMatrix2 = {
+		obb2.orientations[0].v[0],obb2.orientations[0].v[1],obb2.orientations[0].v[2],0,
+		obb2.orientations[1].v[0],obb2.orientations[1].v[1],obb2.orientations[1].v[2],0,
+		obb2.orientations[2].v[0],obb2.orientations[2].v[1],obb2.orientations[2].v[2],0,
+		obb2.center.v[0],obb2.center.v[1],obb2.center.v[2],1
+	};
+
+	Vector3Array wPoint1[8];
+	for (int i = 0; i < 8; i++) {
+		wPoint1[i] = Transform(lPoint1[i], worldMatrix1);
+	}
+
+	Vector3Array wPoint2[8];
+	for (int i = 0; i < 8; i++) {
+		wPoint2[i] = Transform(lPoint2[i], worldMatrix2);
+	}
+
+	Vector3Array planeNormal[6];
+	planeNormal[0] = obb1.orientations[0];
+	planeNormal[1] = obb1.orientations[1];
+	planeNormal[2] = obb1.orientations[2];
+	planeNormal[3] = obb2.orientations[0];
+	planeNormal[4] = obb2.orientations[1];
+	planeNormal[5] = obb2.orientations[2];
+
+	Vector3Array cross[9];
+
+	cross[0] = Cross(obb1.orientations[0], obb2.orientations[0]);
+	cross[1] = Cross(obb1.orientations[0], obb2.orientations[1]);
+	cross[2] = Cross(obb1.orientations[0], obb2.orientations[2]);
+
+	cross[3] = Cross(obb1.orientations[1], obb2.orientations[0]);
+	cross[4] = Cross(obb1.orientations[1], obb2.orientations[1]);
+	cross[5] = Cross(obb1.orientations[1], obb2.orientations[2]);
+
+	cross[6] = Cross(obb1.orientations[2], obb2.orientations[0]);
+	cross[7] = Cross(obb1.orientations[2], obb2.orientations[1]);
+	cross[8] = Cross(obb1.orientations[2], obb2.orientations[2]);
+
+	Vector3Array projected1[8];
+	Vector3Array projected2[8];
+	for (int i = 0; i < 8; i++) {
+		projected1[i] = Project(wPoint1[0], planeNormal[0]);
+		projected2[i] = Project(wPoint2[0], planeNormal[0]);
+	}
+
+	/*int size = sizeof(projected1) / sizeof(projected1[0]);
+	for (int i = 0; i < 8; i++) {
+		float proj1X[8];
+		proj1X[i] = projected1[i].v[0];
+		float proj1Y[8];
+		proj1Y[i] = projected1[i].v[1];
+		float proj1Z[8];
+		proj1Z[i] = projected1[i].v[2];
+		float proj2X[8];
+		proj2X[i] = projected2[i].v[0];
+		float proj2Y[8];
+		proj2Y[i] = projected2[i].v[1];
+		float proj2Z[8];
+		proj2Z[i] = projected2[i].v[2];
+	}
+
+	int* max1X = std::max_element(proj1X,);*/
+	return true;
+}
+
 Vector3Array Perpendicular(const Vector3Array& vector)
 {
 	if (vector.v[0] != 0.0f || vector.v[1] != 0.0f) {
@@ -756,6 +900,42 @@ void DrawPlane(const Plane& plane, const Camera3dData& camera, uint32_t color)
 		Novice::DrawLine(int(points[3].v[0]), int(points[3].v[1]), int(points[0].v[0]), int(points[0].v[1]), color);
 		Novice::ScreenPrintf(int(points[i].v[0]), int(points[i].v[1]), "%d", i);
 	}
+}
+
+void DrawBezier(const Vector3Array& controlPoint0, const Vector3Array& controlPoint1, const Vector3Array& controlPoint2, const Camera3dData& camera, uint32_t color)
+{
+	Vector3Array mainPoint, sub1, sub2;
+	std::vector<Vector3Array> points;
+	float t = 0;
+	while (true) {
+		t += 0.01f;
+		sub1 = Lerp(controlPoint0, controlPoint1, t);
+		sub2 = Lerp(controlPoint1, controlPoint2, t);
+		mainPoint = Lerp(sub1, sub2, t);
+		points.emplace_back(mainPoint);
+		if (t > 1.0f) {
+			t = 0;
+			break;
+		}
+	}
+
+	for (int i = 1; i < points.size(); i++) {
+		DrawLine(points[i - 1], points[i], camera, color);
+		DrawLine(points[0], controlPoint0, camera, color);
+	}
+	points.clear();
+}
+
+Vector3Array Lerp(const Vector3Array& v1, const Vector3Array& v2, float t)
+{
+	float newt = std::clamp(t, 0.0f, 1.0f);
+	Vector3Array result;
+
+	result.v[0] = v1.v[0] * (1.0f - newt) + v2.v[0] * newt;
+	result.v[1] = v1.v[1] * (1.0f - newt) + v2.v[1] * newt;
+	result.v[2] = v1.v[2] * (1.0f - newt) + v2.v[2] * newt;
+
+	return result;
 }
 
 Vector3Array Cross(const Vector3Array& v1, const Vector3Array& v2) {
