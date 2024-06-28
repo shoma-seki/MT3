@@ -24,43 +24,23 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Camera3d* camera = new Camera3d({ 1.0f,1.0f,1.0f }, { 0.26f,0.0f,0.0f }, { 0.0f,1.9f,-6.49f });
 
-	Vector3Array controlPoints[4]{
-		{-0.8f,0.58f,1.0f},
-		{1.76f,1.0f,-0.3f},
-		{0.94f,-0.7f,2.3f},
-		{-0.53f,-0.26f,-0.15f},
+	Vector3Array translates[3] = {
+		{0.2f,1.0f,0.0f},
+		{0.4f,0.0f,0.0f},
+		{0.3f,0.0f,0.0f},
 	};
 
-	/*Sphere sphere{};
-	sphere.center = { 0,0,0 };
-	sphere.radius = 0.5f;*/
-
-	/*OBB obb1{
-		.center{-0.1f,0.0f,0.0f},
-		.orientations = {
-		{1.0f,0.0f,0.0f},
-		{0.0f,1.0f,0.0f},
-		{0.0f,0.0f,1.0f}
-			},
-		.size{0.5,0.5f,0.5f}
+	Vector3Array rotates[3] = {
+		{0.0f,0.0f,-6.8f},
+		{0.0f,0.0f,-1.4f},
+		{0.0f,0.0f,0.0f},
 	};
 
-	OBB obb2{
-		.center{-0.1f,0.0f,0.0f},
-		.orientations = {
-		{1.0f,0.0f,0.0f},
-		{0.0f,1.0f,0.0f},
-		{0.0f,0.0f,1.0f}
-			},
-		.size{0.5,0.5f,0.5f}
+	Vector3Array scales[3] = {
+		{1.0f,1.0f,1.0f},
+		{1.0f,1.0f,1.0f},
+		{1.0f,1.0f,1.0f},
 	};
-
-	Vector3Array rotate1{};
-	Vector3Array rotate2{};*/
-
-	/*Sphere sphere2{};
-	sphere1.center = { 3,0,0 };
-	sphere1.radius = 2;*/
 
 	//Segment segment{ {-0.7f,0.3f,0.0f},{2.0f,-0.5f,0.0f} };
 	/*Vector3Array point{ -1.5f,0.6f,0.6f };
@@ -73,24 +53,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Sphere pointSphere{ point,0.01f };
 	Sphere closestPointSphere{ closestPoint,0.01f };*/
 
-	/*Triangle triangle{};
-	triangle.pos[0].local = { 0,1,0 };
-	triangle.pos[1].local = { 1,-1,0 };
-	triangle.pos[2].local = { -1,-1,0 };
-	triangle.scale = { 1,1,1 };
-
-	Vector3Array v01 = Subtract(triangle.worldPos[1], triangle.worldPos[0]);
+	/*Vector3Array v01 = Subtract(triangle.worldPos[1], triangle.worldPos[0]);
 	Vector3Array v12 = Subtract(triangle.worldPos[2], triangle.worldPos[1]);
-	Vector3Array n = Normalize(Cross(v01, v12));
-
-	Plane plane = {};
-	plane.distance = Dot(triangle.worldPos[1],n);
-	plane.normal = n;*/
-
-	/*AABB aabb = {
-	.min = {-0.5f,-0.5f,-0.5f},
-	.max = {0.5f,0.5f,0.5f},
-	};*/
+	Vector3Array n = Normalize(Cross(v01, v12));*/
 
 	uint32_t color = 0xFFFFFFFF;
 
@@ -113,27 +78,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Vector3Array end = RenderingPipeline(Vector3Array{}, endWorldMatrix, camera->GetCamera());*/
 		color = 0xFFFFFFFF;
 
-		/*aabb.min.v[0] = (std::min)(aabb.min.v[0], aabb.max.v[0]);
-		aabb.min.v[1] = (std::min)(aabb.min.v[1], aabb.max.v[1]);
-		aabb.min.v[2] = (std::min)(aabb.min.v[2], aabb.max.v[2]);*/
+		Matrix4x4 localS = MakeAffineMatrix(scales[0], rotates[0], translates[0]);
+		Matrix4x4 localE = MakeAffineMatrix(scales[1], rotates[1], translates[1]);
+		Matrix4x4 localH = MakeAffineMatrix(scales[2], rotates[2], translates[2]);
 
-		/*if (isCollision(obb1, obb2)) {
-			color = RED;
-		}*/
-		/*v01 = Subtract(triangle.worldPos[1], triangle.worldPos[0]);
-		v12 = Subtract(triangle.worldPos[2], triangle.worldPos[1]);
-		n = Normalize(Cross(v01, v12));
+		Matrix4x4 worldS = localS;
+		Matrix4x4 worldE = Multiply(localE, localS);
+		Matrix4x4 worldH = Multiply(localH, Multiply(localE, localS));
 
-		plane.distance = Dot(triangle.worldPos[0], n);
-		plane.normal = n;*/
-
-		/*RenderingPipeline(triangle, camera->GetCamera());
-		if (isCollision(segment, plane)) {
-			color = BLUE;
-		}
-		if (isCollision(triangle, segment) && isCollision(segment, plane)) {
-			color = RED;
-		}*/
+		Vector3Array worldPS = Transform({ 0,0,0 }, worldS);
+		Vector3Array worldPE = Transform({ 0,0,0 }, worldE);
+		Vector3Array worldPH = Transform({ 0,0,0 }, worldH);
 
 		/*Matrix4x4 rotateMatrix1 = Multiply(MakeRotateXMatrix(rotate1.v[0]), Multiply(MakeRotateYMatrix(rotate1.v[1]), MakeRotateZMatrix(rotate1.v[2])));
 
@@ -171,61 +126,30 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓描画処理ここから
 		///
 		DrawGrid(camera->GetCamera());
-		DrawCatmullRom(controlPoints, camera->GetCamera(), color);
-		DrawSphere(Sphere{ .center = controlPoints[0],.radius = 0.01f }, camera->GetCamera(), 0x000000FF, 5);
-		DrawSphere(Sphere{ .center = controlPoints[1],.radius = 0.01f }, camera->GetCamera(), 0x000000FF, 5);
-		DrawSphere(Sphere{ .center = controlPoints[2],.radius = 0.01f }, camera->GetCamera(), 0x000000FF, 5);
-		DrawSphere(Sphere{ .center = controlPoints[3],.radius = 0.01f }, camera->GetCamera(), 0x000000FF, 5);
-		/*DrawOBB(obb1, camera->GetCamera(), color);
-		DrawOBB(obb2, camera->GetCamera(), color);*/
-		////DrawLine(camera->GetCamera());
+
+		DrawSphere(Sphere{ .center = worldPS,.radius = 0.1f }, camera->GetCamera(), 0xFF0000FF, 10);
+		DrawSphere(Sphere{ .center = worldPE,.radius = 0.1f }, camera->GetCamera(), 0x00FF00FF, 10);
+		DrawSphere(Sphere{ .center = worldPH,.radius = 0.1f }, camera->GetCamera(), 0x0000FFFF, 10);
+		
+		DrawLine(worldPS, worldPE, camera->GetCamera(), WHITE);
+		DrawLine(worldPE, worldPH, camera->GetCamera(), WHITE);
+
 		camera->DebugDraw();
 		//Novice::DrawLine(int(start.v[0]), int(start.v[1]), int(end.v[0]), int(end.v[1]), color);
-		//MyDrawTriangle(triangle, color);
-		//DrawPlane(plane, camera->GetCamera(), color);
-
-		//Novice::ScreenPrintf(0, 15, "%f", plane.distance);
-
-		//DrawSphere(sphere, camera->GetCamera(), color, 10);
-		//DrawSphere(closestPointSphere, camera->GetCamera(), BLACK, 10);
-		/*if (isCollision(sphere1, sphere2)) {
-			color = RED;
-		}*/
-
-		//DrawSphere(sphere1, camera->GetCamera(), color, 36);
-		/*DrawSphere(sphere2, camera->GetCamera(), 0xFFFFFFFF, 10); */
-
-		//DrawPlane(plane, camera->GetCamera(), color);
 
 		//imgui
-		ImGui::Begin("Bezier");
-		ImGui::DragFloat3("control0", controlPoints[0].v, 0.1f);
-		ImGui::DragFloat3("control1", controlPoints[1].v, 0.1f);
-		ImGui::DragFloat3("control2", controlPoints[2].v, 0.1f);
-		ImGui::DragFloat3("control3", controlPoints[3].v, 0.1f);
-		/*ImGui::SliderFloat3("center1", obb1.center.v, -30.0f, 30.0f);
-		ImGui::SliderFloat3("rotate1", rotate1.v, -10.0f, 10.0f);
-		ImGui::SliderFloat3("center2", obb2.center.v, -30.0f, 30.0f);
-		ImGui::SliderFloat3("rotate2", rotate2.v, -10.0f, 10.0f);*/
-		/*ImGui::SliderFloat3("aabb1.min", aabb.min.v, -10.0f, 10.0f);
-		ImGui::SliderFloat3("aabb1.max", aabb.max.v, -10.0f, 10.0f);*/
+		ImGui::Begin("Window");
+		ImGui::DragFloat3("translates0", translates[0].v, 0.1f);
+		ImGui::DragFloat3("rotates0", rotates[0].v, 0.1f);
+		ImGui::DragFloat3("scales0", scales[0].v, 0.1f);
+		ImGui::DragFloat3("translates1", translates[1].v, 0.1f);
+		ImGui::DragFloat3("rotates1", rotates[1].v, 0.1f);
+		ImGui::DragFloat3("scales1", scales[1].v, 0.1f);
+		ImGui::DragFloat3("translates2", translates[2].v, 0.1f);
+		ImGui::DragFloat3("rotates2", rotates[2].v, 0.1f);
+		ImGui::DragFloat3("scales2", scales[2].v, 0.1f);
 		ImGui::End();
 
-		//ImGui::Begin("Segment");
-		//ImGui::DragFloat3("PlaneNormal", plane.normal.v, 0.1f);
-		//ImGui::DragFloat("PlaneDistance", &plane.distance, 0.1f);
-		//ImGui::DragFloat3("segmentOrigin", segment.origin.v, 0.1f);
-		//ImGui::DragFloat3("segmentDiff", segment.diff.v, 0.1f);
-		//plane.normal = Normalize(plane.normal);
-		/*ImGui::SliderFloat3("center1", sphere.center.v, -10.0f, 10.0f);
-		ImGui::SliderFloat("radius1", &sphere.radius, 0.01f, 2.0f);*/
-		/*ImGui::SliderFloat3("center2", sphere2.center.v, -10.0f, 10.0f);
-		ImGui::SliderFloat("radius2", &sphere2.radius, 0.01f, 2.0f);*/
-		/*ImGui::InputFloat3("Point", point.v, "%0.3f", ImGuiInputTextFlags_ReadOnly);
-		ImGui::InputFloat3("SegmentOrigin", segment.origin.v, "%0.3f", ImGuiInputTextFlags_ReadOnly);
-		ImGui::InputFloat3("SegmentDiff", segment.diff.v, "%0.3f", ImGuiInputTextFlags_ReadOnly);
-		ImGui::InputFloat3("Project", project.v, "%0.3f", ImGuiInputTextFlags_ReadOnly);*/
-		//ImGui::End();
 		///
 		/// ↑描画処理ここまで
 		///
