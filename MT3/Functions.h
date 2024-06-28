@@ -114,4 +114,6 @@ Vector3Array Perpendicular(const Vector3Array& vector);
 void DrawPlane(const Plane& plane, const Camera3dData& camera, uint32_t color);
 void DrawBezier(const Vector3Array& controlPoint0, const Vector3Array& controlPoint1,
 	const Vector3Array& controlPoint2, const Camera3dData& camera, uint32_t color);
+Vector3Array CatmullRom(Vector3Array p[4], float t, int nowPoint, int pointMin, int pointMax);
+void DrawCatmullRom(Vector3Array p[4], const Camera3dData& camera, uint32_t color);
 Vector3Array Lerp(const Vector3Array& v1, const Vector3Array& v2, float t);

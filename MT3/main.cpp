@@ -24,10 +24,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Camera3d* camera = new Camera3d({ 1.0f,1.0f,1.0f }, { 0.26f,0.0f,0.0f }, { 0.0f,1.9f,-6.49f });
 
-	Vector3Array controlPoints[3]{
+	Vector3Array controlPoints[4]{
 		{-0.8f,0.58f,1.0f},
 		{1.76f,1.0f,-0.3f},
 		{0.94f,-0.7f,2.3f},
+		{-0.53f,-0.26f,-0.15f},
 	};
 
 	/*Sphere sphere{};
@@ -170,10 +171,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓描画処理ここから
 		///
 		DrawGrid(camera->GetCamera());
-		DrawBezier(controlPoints[0], controlPoints[1], controlPoints[2], camera->GetCamera(), color);
+		DrawCatmullRom(controlPoints, camera->GetCamera(), color);
 		DrawSphere(Sphere{ .center = controlPoints[0],.radius = 0.01f }, camera->GetCamera(), 0x000000FF, 5);
 		DrawSphere(Sphere{ .center = controlPoints[1],.radius = 0.01f }, camera->GetCamera(), 0x000000FF, 5);
 		DrawSphere(Sphere{ .center = controlPoints[2],.radius = 0.01f }, camera->GetCamera(), 0x000000FF, 5);
+		DrawSphere(Sphere{ .center = controlPoints[3],.radius = 0.01f }, camera->GetCamera(), 0x000000FF, 5);
 		/*DrawOBB(obb1, camera->GetCamera(), color);
 		DrawOBB(obb2, camera->GetCamera(), color);*/
 		////DrawLine(camera->GetCamera());
@@ -200,6 +202,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::DragFloat3("control0", controlPoints[0].v, 0.1f);
 		ImGui::DragFloat3("control1", controlPoints[1].v, 0.1f);
 		ImGui::DragFloat3("control2", controlPoints[2].v, 0.1f);
+		ImGui::DragFloat3("control3", controlPoints[3].v, 0.1f);
 		/*ImGui::SliderFloat3("center1", obb1.center.v, -30.0f, 30.0f);
 		ImGui::SliderFloat3("rotate1", rotate1.v, -10.0f, 10.0f);
 		ImGui::SliderFloat3("center2", obb2.center.v, -30.0f, 30.0f);

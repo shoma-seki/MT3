@@ -926,6 +926,71 @@ void DrawBezier(const Vector3Array& controlPoint0, const Vector3Array& controlPo
 	points.clear();
 }
 
+Vector3Array CatmullRom(Vector3Array p[4], float t, int nowPoint, int pointMin, int pointMax)
+{
+	Vector3Array result{};
+	if (nowPoint == pointMin) {
+		result.v[0] = 0.5f * ((-p[0].v[0] + 3 * p[0].v[0] - 3 * p[1].v[0] + p[2].v[0]) * powf(t, 3) +
+			(2 * p[0].v[0] - 5 * p[0].v[0] + 4 * p[1].v[0] - p[2].v[0]) * powf(t, 2) +
+			(-p[0].v[0] + p[1].v[0]) * t + 2 * p[0].v[0]);
+		result.v[1] = 0.5f * ((-p[0].v[1] + 3 * p[0].v[1] - 3 * p[1].v[1] + p[2].v[1]) * powf(t, 3) +
+			(2 * p[0].v[1] - 5 * p[0].v[1] + 4 * p[1].v[1] - p[2].v[1]) * powf(t, 2) +
+			(-p[0].v[1] + p[1].v[1]) * t + 2 * p[0].v[1]);
+		result.v[2] = 0.5f * ((-p[0].v[2] + 3 * p[0].v[2] - 3 * p[1].v[2] + p[2].v[2]) * powf(t, 3) +
+			(2 * p[0].v[2] - 5 * p[0].v[2] + 4 * p[1].v[2] - p[2].v[2]) * powf(t, 2) +
+			(-p[0].v[2] + p[1].v[2]) * t + 2 * p[0].v[2]);
+	}
+	else if (nowPoint == pointMax - 1) {
+		result.v[0] = 0.5f * ((-p[pointMax - 2].v[0] + 3 * p[pointMax - 1].v[0] - 3 * p[pointMax].v[0] + p[pointMax].v[0]) * powf(t, 3) +
+			(2 * p[pointMax - 2].v[0] - 5 * p[pointMax - 1].v[0] + 4 * p[pointMax].v[0] - p[pointMax].v[0]) * powf(t, 2) +
+			(-p[pointMax - 2].v[0] + p[pointMax].v[0]) * t + 2 * p[pointMax - 1].v[0]);
+		result.v[1] = 0.5f * ((-p[pointMax - 2].v[1] + 3 * p[pointMax - 1].v[1] - 3 * p[pointMax].v[1] + p[pointMax].v[1]) * powf(t, 3) +
+			(2 * p[pointMax - 2].v[1] - 5 * p[pointMax - 1].v[1] + 4 * p[pointMax].v[1] - p[pointMax].v[1]) * powf(t, 2) +
+			(-p[pointMax - 2].v[1] + p[pointMax].v[1]) * t + 2 * p[pointMax - 1].v[1]);
+		result.v[2] = 0.5f * ((-p[pointMax - 2].v[2] + 3 * p[pointMax - 1].v[2] - 3 * p[pointMax].v[2] + p[pointMax].v[2]) * powf(t, 3) +
+			(2 * p[pointMax - 2].v[2] - 5 * p[pointMax - 1].v[2] + 4 * p[pointMax].v[2] - p[pointMax].v[2]) * powf(t, 2) +
+			(-p[pointMax - 2].v[2] + p[pointMax].v[2]) * t + 2 * p[pointMax - 1].v[2]);
+	}
+	else {
+		result.v[0] = 0.5f * ((-p[nowPoint - 1].v[0] + 3 * p[nowPoint].v[0] - 3 * p[nowPoint + 1].v[0] + p[nowPoint + 2].v[0]) * powf(t, 3) +
+			(2 * p[nowPoint - 1].v[0] - 5 * p[nowPoint].v[0] + 4 * p[nowPoint + 1].v[0] - p[nowPoint + 2].v[0]) * powf(t, 2) +
+			(-p[nowPoint - 1].v[0] + p[2].v[0]) * t + 2 * p[nowPoint].v[0]);
+		result.v[1] = 0.5f * ((-p[nowPoint - 1].v[1] + 3 * p[nowPoint].v[1] - 3 * p[nowPoint + 1].v[1] + p[nowPoint + 2].v[1]) * powf(t, 3) +
+			(2 * p[nowPoint - 1].v[1] - 5 * p[nowPoint].v[1] + 4 * p[nowPoint + 1].v[1] - p[nowPoint + 2].v[1]) * powf(t, 2) +
+			(-p[nowPoint - 1].v[1] + p[nowPoint + 1].v[1]) * t + 2 * p[nowPoint].v[1]);
+		result.v[2] = 0.5f * ((-p[nowPoint - 1].v[2] + 3 * p[nowPoint].v[2] - 3 * p[nowPoint + 1].v[2] + p[nowPoint + 2].v[2]) * powf(t, 3) +
+			(2 * p[nowPoint - 1].v[2] - 5 * p[nowPoint].v[2] + 4 * p[nowPoint + 1].v[2] - p[nowPoint + 2].v[2]) * powf(t, 2) +
+			(-p[nowPoint - 1].v[2] + p[nowPoint + 1].v[2]) * t + 2 * p[nowPoint].v[2]);
+	}
+	return result;
+}
+
+void DrawCatmullRom(Vector3Array p[4], const Camera3dData& camera, uint32_t color)
+{
+	float t = 0;
+	int nowPoint = 0;
+	int maxPoint = 3;
+	std::vector<Vector3Array> points;
+	while (true)
+	{
+		t += 0.01f;
+		points.emplace_back(CatmullRom(p, t, nowPoint, 0, 3));
+		if (Length(Subtract(points.back(), p[nowPoint + 1])) < 0.05f) {
+			t = 0;
+			nowPoint++;
+			if (nowPoint == maxPoint) {
+				break;
+			}
+		}
+	}
+
+	for (int i = 1; i < points.size(); i++) {
+		DrawLine(points[i - 1], points[i], camera, color);
+		DrawLine(points[0], p[0], camera, color);
+	}
+	points.clear();
+}
+
 Vector3Array Lerp(const Vector3Array& v1, const Vector3Array& v2, float t)
 {
 	float newt = std::clamp(t, 0.0f, 1.0f);
