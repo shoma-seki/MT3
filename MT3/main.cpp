@@ -8,6 +8,7 @@
 #include "Camera3d.h"
 #include "ImGuiManager.h"
 #include "MyDraw.h"
+#include "OperatorOverload.h"
 
 const char kWindowTitle[] = "LC1A_17_セキ_ショウマ_タイトル";
 
@@ -24,7 +25,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Camera3d* camera = new Camera3d({ 1.0f,1.0f,1.0f }, { 0.26f,0.0f,0.0f }, { 0.0f,1.9f,-6.49f });
 
-	Vector3Array translates[3] = {
+	/*Vector3Array translates[3] = {
 		{0.2f,1.0f,0.0f},
 		{0.4f,0.0f,0.0f},
 		{0.3f,0.0f,0.0f},
@@ -40,7 +41,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		{1.0f,1.0f,1.0f},
 		{1.0f,1.0f,1.0f},
 		{1.0f,1.0f,1.0f},
-	};
+	};*/
 
 	//Segment segment{ {-0.7f,0.3f,0.0f},{2.0f,-0.5f,0.0f} };
 	/*Vector3Array point{ -1.5f,0.6f,0.6f };
@@ -56,6 +57,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	/*Vector3Array v01 = Subtract(triangle.worldPos[1], triangle.worldPos[0]);
 	Vector3Array v12 = Subtract(triangle.worldPos[2], triangle.worldPos[1]);
 	Vector3Array n = Normalize(Cross(v01, v12));*/
+
+	Vector3Array a{ 0.2f, 1.0f, 0.0f };
+	Vector3Array b{ 2.4f, 3.1f, 1.2f };
+	Vector3Array c = a + b;
+	Vector3Array d = a - b;
+	Vector3Array e = a * 2.4f;
+	Vector3Array rotate{ 0.4f, 1.43f, -0.8f };
+	Matrix4x4 rotateXMatrix = MakeRotateXMatrix(rotate.v[0]);
+	Matrix4x4 rotateYMatrix = MakeRotateYMatrix(rotate.v[1]);
+	Matrix4x4 rotateZMatrix = MakeRotateZMatrix(rotate.v[2]);
+	Matrix4x4 rotateMatrix = rotateXMatrix * rotateYMatrix * rotateZMatrix;
 
 	uint32_t color = 0xFFFFFFFF;
 
@@ -78,7 +90,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Vector3Array end = RenderingPipeline(Vector3Array{}, endWorldMatrix, camera->GetCamera());*/
 		color = 0xFFFFFFFF;
 
-		Matrix4x4 localS = MakeAffineMatrix(scales[0], rotates[0], translates[0]);
+		/*Matrix4x4 localS = MakeAffineMatrix(scales[0], rotates[0], translates[0]);
 		Matrix4x4 localE = MakeAffineMatrix(scales[1], rotates[1], translates[1]);
 		Matrix4x4 localH = MakeAffineMatrix(scales[2], rotates[2], translates[2]);
 
@@ -88,35 +100,35 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		Vector3Array worldPS = Transform({ 0,0,0 }, worldS);
 		Vector3Array worldPE = Transform({ 0,0,0 }, worldE);
-		Vector3Array worldPH = Transform({ 0,0,0 }, worldH);
+		Vector3Array worldPH = Transform({ 0,0,0 }, worldH);*/
 
 		/*Matrix4x4 rotateMatrix1 = Multiply(MakeRotateXMatrix(rotate1.v[0]), Multiply(MakeRotateYMatrix(rotate1.v[1]), MakeRotateZMatrix(rotate1.v[2])));
 
-		obb1.orientations[0].v[0] = rotateMatrix1.matrix[0][0];
-		obb1.orientations[0].v[1] = rotateMatrix1.matrix[0][1];
-		obb1.orientations[0].v[2] = rotateMatrix1.matrix[0][2];
+		obb1.orientations[0].v[0] = rotateMatrix1.matrixatrix[0][0];
+		obb1.orientations[0].v[1] = rotateMatrix1.matrixatrix[0][1];
+		obb1.orientations[0].v[2] = rotateMatrix1.matrixatrix[0][2];
 
-		obb1.orientations[1].v[0] = rotateMatrix1.matrix[1][0];
-		obb1.orientations[1].v[1] = rotateMatrix1.matrix[1][1];
-		obb1.orientations[1].v[2] = rotateMatrix1.matrix[1][2];
+		obb1.orientations[1].v[0] = rotateMatrix1.matrixatrix[1][0];
+		obb1.orientations[1].v[1] = rotateMatrix1.matrixatrix[1][1];
+		obb1.orientations[1].v[2] = rotateMatrix1.matrixatrix[1][2];
 
-		obb1.orientations[2].v[0] = rotateMatrix1.matrix[2][0];
-		obb1.orientations[2].v[1] = rotateMatrix1.matrix[2][1];
-		obb1.orientations[2].v[2] = rotateMatrix1.matrix[2][2];
+		obb1.orientations[2].v[0] = rotateMatrix1.matrixatrix[2][0];
+		obb1.orientations[2].v[1] = rotateMatrix1.matrixatrix[2][1];
+		obb1.orientations[2].v[2] = rotateMatrix1.matrixatrix[2][2];
 
 		Matrix4x4 rotateMatrix2 = Multiply(MakeRotateXMatrix(rotate2.v[0]), Multiply(MakeRotateYMatrix(rotate2.v[1]), MakeRotateZMatrix(rotate2.v[2])));
 
-		obb2.orientations[0].v[0] = rotateMatrix2.matrix[0][0];
-		obb2.orientations[0].v[1] = rotateMatrix2.matrix[0][1];
-		obb2.orientations[0].v[2] = rotateMatrix2.matrix[0][2];
+		obb2.orientations[0].v[0] = rotateMatrix2.matrixatrix[0][0];
+		obb2.orientations[0].v[1] = rotateMatrix2.matrixatrix[0][1];
+		obb2.orientations[0].v[2] = rotateMatrix2.matrixatrix[0][2];
 
-		obb2.orientations[1].v[0] = rotateMatrix2.matrix[1][0];
-		obb2.orientations[1].v[1] = rotateMatrix2.matrix[1][1];
-		obb2.orientations[1].v[2] = rotateMatrix2.matrix[1][2];
+		obb2.orientations[1].v[0] = rotateMatrix2.matrixatrix[1][0];
+		obb2.orientations[1].v[1] = rotateMatrix2.matrixatrix[1][1];
+		obb2.orientations[1].v[2] = rotateMatrix2.matrixatrix[1][2];
 
-		obb2.orientations[2].v[0] = rotateMatrix2.matrix[2][0];
-		obb2.orientations[2].v[1] = rotateMatrix2.matrix[2][1];
-		obb2.orientations[2].v[2] = rotateMatrix2.matrix[2][2];*/
+		obb2.orientations[2].v[0] = rotateMatrix2.matrixatrix[2][0];
+		obb2.orientations[2].v[1] = rotateMatrix2.matrixatrix[2][1];
+		obb2.orientations[2].v[2] = rotateMatrix2.matrixatrix[2][2];*/
 
 		///
 		/// ↑更新処理ここまで
@@ -127,19 +139,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 		DrawGrid(camera->GetCamera());
 
-		DrawSphere(Sphere{ .center = worldPS,.radius = 0.1f }, camera->GetCamera(), 0xFF0000FF, 10);
+		/*DrawSphere(Sphere{ .center = worldPS,.radius = 0.1f }, camera->GetCamera(), 0xFF0000FF, 10);
 		DrawSphere(Sphere{ .center = worldPE,.radius = 0.1f }, camera->GetCamera(), 0x00FF00FF, 10);
 		DrawSphere(Sphere{ .center = worldPH,.radius = 0.1f }, camera->GetCamera(), 0x0000FFFF, 10);
-		
+
 		DrawLine(worldPS, worldPE, camera->GetCamera(), WHITE);
-		DrawLine(worldPE, worldPH, camera->GetCamera(), WHITE);
+		DrawLine(worldPE, worldPH, camera->GetCamera(), WHITE);*/
 
 		camera->DebugDraw();
 		//Novice::DrawLine(int(start.v[0]), int(start.v[1]), int(end.v[0]), int(end.v[1]), color);
 
 		//imgui
 		ImGui::Begin("Window");
-		ImGui::DragFloat3("translates0", translates[0].v, 0.1f);
+		/*ImGui::DragFloat3("translates0", translates[0].v, 0.1f);
 		ImGui::DragFloat3("rotates0", rotates[0].v, 0.1f);
 		ImGui::DragFloat3("scales0", scales[0].v, 0.1f);
 		ImGui::DragFloat3("translates1", translates[1].v, 0.1f);
@@ -147,7 +159,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::DragFloat3("scales1", scales[1].v, 0.1f);
 		ImGui::DragFloat3("translates2", translates[2].v, 0.1f);
 		ImGui::DragFloat3("rotates2", rotates[2].v, 0.1f);
-		ImGui::DragFloat3("scales2", scales[2].v, 0.1f);
+		ImGui::DragFloat3("scales2", scales[2].v, 0.1f);*/
+		ImGui::Text("c:%f, %f, %f", c.v[0], c.v[1], c.v[2]);
+		ImGui::Text("d:%f, %f, %f", d.v[0], d.v[1], d.v[2]);
+		ImGui::Text("e: %f %f %f", e.v[0], e.v[1], e.v[2]);
+		ImGui::Text(
+			"matrix:\n%f, %f, %f, %f\n%f, %f, %f, %f\n%f, %f, %f, %f\n%f, %f, %f, %f\n",
+			rotateMatrix.matrix[0][0], rotateMatrix.matrix[0][1], rotateMatrix.matrix[0][2],
+			rotateMatrix.matrix[0][3], rotateMatrix.matrix[1][0], rotateMatrix.matrix[1][1],
+			rotateMatrix.matrix[1][2], rotateMatrix.matrix[1][3], rotateMatrix.matrix[2][0],
+			rotateMatrix.matrix[2][1], rotateMatrix.matrix[2][2], rotateMatrix.matrix[2][3],
+			rotateMatrix.matrix[3][0], rotateMatrix.matrix[3][1], rotateMatrix.matrix[3][2],
+			rotateMatrix.matrix[3][3]);
 		ImGui::End();
 
 		///

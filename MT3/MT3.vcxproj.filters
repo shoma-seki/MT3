@@ -165,5 +165,8 @@
     <ClInclude Include="Camera.h">
       <Filter>Camera\Camera2D</Filter>
     </ClInclude>
+    <ClInclude Include="OperatorOverload.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

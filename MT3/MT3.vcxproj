@@ -157,6 +157,7 @@ xcopy C:\KamataEngine\DirectXGame\Resources "$(OutDirFullPath)NoviceResources" /
     <ClInclude Include="MatrixFunc.h" />
     <ClInclude Include="MyDraw.h" />
     <ClInclude Include="Struct.h" />
+    <ClInclude Include="OperatorOverload.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

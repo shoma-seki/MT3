@@ -29,6 +29,11 @@ struct Vector2Float {
 
 struct Vector3Array {
 	float v[3];
+
+	Vector3Array& operator*=(float s) { v[0] *= s; v[1] *= s; v[2] *= s; return *this; }
+	Vector3Array& operator-=(const Vector3Array& vec) { this->v[0] -= vec.v[0]; this->v[1] -= vec.v[1]; this->v[2] -= vec.v[2]; return *this; }
+	Vector3Array& operator+=(const Vector3Array& vec) { this->v[0] += vec.v[0]; this->v[1] += vec.v[1]; this->v[2] += vec.v[2]; return *this; }
+	Vector3Array& operator/=(float s) { v[0] /= s; v[1] /= s; v[2] /= s; return *this; }
 };
 
 struct Vector3Float {
