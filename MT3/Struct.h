@@ -85,7 +85,7 @@ struct Object {
 	Matrix3x3 wvpVpMatrix{};
 };
 
-struct Point3d{
+struct Point3d {
 	Vector3Array local;
 	Vector3Array screen;
 };
@@ -164,4 +164,15 @@ struct OBB {
 	Vector3Array center;
 	Vector3Array orientations[3];
 	Vector3Array size;
+};
+
+struct Spring {
+	Vector3Array anchor;
+	float naturalLength, stiffness, dampingCoeffient;
+};
+
+struct Ball{
+	Vector3Array position, velocity, acceleration;
+	float mass, radius;
+	uint32_t color;
 };

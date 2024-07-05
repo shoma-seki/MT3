@@ -25,6 +25,24 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Camera3d* camera = new Camera3d({ 1.0f,1.0f,1.0f }, { 0.26f,0.0f,0.0f }, { 0.0f,1.9f,-6.49f });
 
+	Spring spring{
+		.anchor = {0.0f,0.0f,0.0f},
+		.naturalLength = 1.0f,
+		.stiffness = 100.0f,
+		.dampingCoeffient = 2.0f
+	};
+
+	Ball ball{
+		.position = {1.2f,0.0f,0.0f},
+		.mass = 2.0f,
+		.radius = 0.05f,
+		.color = BLUE
+	};
+
+	float deltaTime = 1.0f / 60.0f;
+
+	bool isStart = false;
+
 	/*Vector3Array translates[3] = {
 		{0.2f,1.0f,0.0f},
 		{0.4f,0.0f,0.0f},
@@ -58,7 +76,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3Array v12 = Subtract(triangle.worldPos[2], triangle.worldPos[1]);
 	Vector3Array n = Normalize(Cross(v01, v12));*/
 
-	Vector3Array a{ 0.2f, 1.0f, 0.0f };
+	/*Vector3Array a{ 0.2f, 1.0f, 0.0f };
 	Vector3Array b{ 2.4f, 3.1f, 1.2f };
 	Vector3Array c = a + b;
 	Vector3Array d = a - b;
@@ -67,7 +85,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Matrix4x4 rotateXMatrix = MakeRotateXMatrix(rotate.v[0]);
 	Matrix4x4 rotateYMatrix = MakeRotateYMatrix(rotate.v[1]);
 	Matrix4x4 rotateZMatrix = MakeRotateZMatrix(rotate.v[2]);
-	Matrix4x4 rotateMatrix = rotateXMatrix * rotateYMatrix * rotateZMatrix;
+	Matrix4x4 rotateMatrix = rotateXMatrix * rotateYMatrix * rotateZMatrix;*/
 
 	uint32_t color = 0xFFFFFFFF;
 
@@ -130,6 +148,23 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		obb2.orientations[2].v[1] = rotateMatrix2.matrixatrix[2][1];
 		obb2.orientations[2].v[2] = rotateMatrix2.matrixatrix[2][2];*/
 
+		if (isStart) {
+			Vector3Array diff = ball.position - spring.anchor;
+			float length = Length(diff);
+			if (length != 0.0f) {
+				Vector3Array direction = Normalize(diff);
+				Vector3Array restPosition = spring.anchor + direction * spring.naturalLength;
+				Vector3Array displacement = length * (ball.position - restPosition);
+				Vector3Array restoringForce = -spring.stiffness * displacement;
+				Vector3Array dampringForce = -spring.dampingCoeffient * ball.velocity;
+				Vector3Array force = restoringForce + dampringForce;
+				ball.acceleration = force / ball.mass;
+			}
+
+			ball.velocity += ball.acceleration * deltaTime;
+			ball.position += ball.velocity * deltaTime;
+		}
+
 		///
 		/// ↑更新処理ここまで
 		///
@@ -138,6 +173,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓描画処理ここから
 		///
 		DrawGrid(camera->GetCamera());
+
+		DrawSphere(Sphere{ .center = ball.position,.radius = 0.05f }, camera->GetCamera(), ball.color, 20);
+		DrawLine(spring.anchor, ball.position, camera->GetCamera(), WHITE);
 
 		/*DrawSphere(Sphere{ .center = worldPS,.radius = 0.1f }, camera->GetCamera(), 0xFF0000FF, 10);
 		DrawSphere(Sphere{ .center = worldPE,.radius = 0.1f }, camera->GetCamera(), 0x00FF00FF, 10);
@@ -151,6 +189,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		//imgui
 		ImGui::Begin("Window");
+		if (ImGui::Button("Start")) {
+			isStart = true;
+			ball.position = { 1.2f,0.0f,0.0f };
+		}
+		if (ImGui::Button("Stop")) {
+			isStart = false;
+		}
 		/*ImGui::DragFloat3("translates0", translates[0].v, 0.1f);
 		ImGui::DragFloat3("rotates0", rotates[0].v, 0.1f);
 		ImGui::DragFloat3("scales0", scales[0].v, 0.1f);
@@ -160,7 +205,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::DragFloat3("translates2", translates[2].v, 0.1f);
 		ImGui::DragFloat3("rotates2", rotates[2].v, 0.1f);
 		ImGui::DragFloat3("scales2", scales[2].v, 0.1f);*/
-		ImGui::Text("c:%f, %f, %f", c.v[0], c.v[1], c.v[2]);
+		/*ImGui::Text("c:%f, %f, %f", c.v[0], c.v[1], c.v[2]);
 		ImGui::Text("d:%f, %f, %f", d.v[0], d.v[1], d.v[2]);
 		ImGui::Text("e: %f %f %f", e.v[0], e.v[1], e.v[2]);
 		ImGui::Text(
@@ -170,7 +215,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			rotateMatrix.matrix[1][2], rotateMatrix.matrix[1][3], rotateMatrix.matrix[2][0],
 			rotateMatrix.matrix[2][1], rotateMatrix.matrix[2][2], rotateMatrix.matrix[2][3],
 			rotateMatrix.matrix[3][0], rotateMatrix.matrix[3][1], rotateMatrix.matrix[3][2],
-			rotateMatrix.matrix[3][3]);
+			rotateMatrix.matrix[3][3]);*/
 		ImGui::End();
 
 		///
