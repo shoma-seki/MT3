@@ -42,15 +42,23 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	float deltaTime = 1.0f / 60.0f;
 	const Vector3Array kGravity{ 0.0f,-9.8f,0.0f };
 
-	Vector3Array p{ 0,0.8f,0 };
+	/*Vector3Array p{ 0,0.8f,0 };
 	Vector3Array c{ 0,0,0 };
 
 	float r = Length(c - p);
 
 	float angularVelocity = 3.14f;
-	float angle = 0.0f;
+	float angle = 0.0f;*/
 
 	bool isStart = false;
+
+	Pendulum pendulum{
+		.anchor = {0.0f,1.0f,0.0f},
+		.length = 0.8f,
+		.angle = 0.7f,
+		.angularVelocity = 0.0f,
+		.angularAcceleration = 0.0f
+	};
 
 	/*Vector3Array translates[3] = {
 		{0.2f,1.0f,0.0f},
@@ -174,8 +182,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			ball.position += ball.velocity * deltaTime;
 		}*/
 
-		if(isStart){
-			angle += angularVelocity * deltaTime;
+		Vector3Array p = { 0,0,0 };
+		if (isStart) {
+			pendulum.angularAcceleration = -(9.8f / pendulum.length) * std::sin(pendulum.angle);
+			pendulum.angularVelocity += pendulum.angularAcceleration * deltaTime;
+			pendulum.angle += pendulum.angularVelocity * deltaTime;
+			p.v[0] = pendulum.anchor.v[0] + std::sin(pendulum.angle) * pendulum.length;
+			p.v[1] = pendulum.anchor.v[1] - std::cos(pendulum.angle) * pendulum.length;
+			p.v[2] = pendulum.anchor.v[2];
 		}
 		/*if (isStart) {
 			Vector3Array v;
@@ -187,9 +201,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			p.v[2] = 0;
 		}*/
 
-		p.v[0] = c.v[0] + std::cos(angle) * r;
-		p.v[1] = c.v[1] + std::sin(angle) * r;
-		p.v[2] = c.v[2];
+
 
 
 		///
@@ -202,8 +214,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		DrawGrid(camera->GetCamera());
 
 		DrawSphere(Sphere{ .center = p,.radius = 0.05f }, camera->GetCamera(), 0x0000FFFF, 20);
-		DrawSphere(Sphere{ .center = c,.radius = 0.05f }, camera->GetCamera(), 0x0000FFFF, 20);
-		//DrawLine(spring.anchor, ball.position, camera->GetCamera(), WHITE);
+		DrawLine(pendulum.anchor, p, camera->GetCamera(), WHITE);
 
 		/*DrawSphere(Sphere{ .center = worldPS,.radius = 0.1f }, camera->GetCamera(), 0xFF0000FF, 10);
 		DrawSphere(Sphere{ .center = worldPE,.radius = 0.1f }, camera->GetCamera(), 0x00FF00FF, 10);

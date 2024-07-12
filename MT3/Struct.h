@@ -176,3 +176,11 @@ struct Ball{
 	float mass, radius;
 	uint32_t color;
 };
+
+struct Pendulum {
+	Vector3Array anchor;
+	float length;
+	float angle;
+	float angularVelocity;
+	float angularAcceleration;
+};
