@@ -26,20 +26,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Camera3d* camera = new Camera3d({ 1.0f,1.0f,1.0f }, { 0.26f,0.0f,0.0f }, { 0.0f,1.9f,-6.49f });
 
 	Spring spring{
-		.anchor = {0.0f,0.0f,0.0f},
-		.naturalLength = 1.0f,
+		.anchor = {0.0f,1.0f,0.0f},
+		.naturalLength = 0.7f,
 		.stiffness = 100.0f,
 		.dampingCoeffient = 2.0f
 	};
 
 	Ball ball{
-		.position = {1.2f,0.0f,0.0f},
+		.position = {0.8f,0.2f,0.0f},
 		.mass = 2.0f,
 		.radius = 0.05f,
 		.color = BLUE
 	};
 
 	float deltaTime = 1.0f / 60.0f;
+	const Vector3Array kGravity{ 0.0f,-9.8f,0.0f };
 
 	bool isStart = false;
 
@@ -158,10 +159,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				Vector3Array restoringForce = -spring.stiffness * displacement;
 				Vector3Array dampringForce = -spring.dampingCoeffient * ball.velocity;
 				Vector3Array force = restoringForce + dampringForce;
-				ball.acceleration = force / ball.mass;
+				ball.acceleration = force / ball.mass + kGravity;
 			}
 
-			ball.velocity += ball.acceleration * deltaTime;
+			ball.velocity += (ball.acceleration ) * deltaTime;
 			ball.position += ball.velocity * deltaTime;
 		}
 
@@ -192,6 +193,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		if (ImGui::Button("Start")) {
 			isStart = true;
 			ball.position = { 1.2f,0.0f,0.0f };
+			ball.acceleration = { 0.0f,0.0f,0.0f };
+			ball.velocity = ball.acceleration;
 		}
 		if (ImGui::Button("Stop")) {
 			isStart = false;
