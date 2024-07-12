@@ -25,7 +25,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Camera3d* camera = new Camera3d({ 1.0f,1.0f,1.0f }, { 0.26f,0.0f,0.0f }, { 0.0f,1.9f,-6.49f });
 
-	Spring spring{
+	/*Spring spring{
 		.anchor = {0.0f,1.0f,0.0f},
 		.naturalLength = 0.7f,
 		.stiffness = 100.0f,
@@ -37,10 +37,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		.mass = 2.0f,
 		.radius = 0.05f,
 		.color = BLUE
-	};
+	};*/
 
 	float deltaTime = 1.0f / 60.0f;
 	const Vector3Array kGravity{ 0.0f,-9.8f,0.0f };
+
+	Vector3Array p{ 0,0.8f,0 };
+	Vector3Array c{ 0,0,0 };
+
+	float r = Length(c - p);
+
+	float angularVelocity = 3.14f;
+	float angle = 0.0f;
 
 	bool isStart = false;
 
@@ -149,7 +157,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		obb2.orientations[2].v[1] = rotateMatrix2.matrixatrix[2][1];
 		obb2.orientations[2].v[2] = rotateMatrix2.matrixatrix[2][2];*/
 
-		if (isStart) {
+		/*if (isStart) {
 			Vector3Array diff = ball.position - spring.anchor;
 			float length = Length(diff);
 			if (length != 0.0f) {
@@ -164,7 +172,25 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			ball.velocity += (ball.acceleration ) * deltaTime;
 			ball.position += ball.velocity * deltaTime;
+		}*/
+
+		if(isStart){
+			angle += angularVelocity * deltaTime;
 		}
+		/*if (isStart) {
+			Vector3Array v;
+			float acceleration = -std::powf(angularVelocity, 2) * r;
+			v.v[0] = -r * angularVelocity * std::sin(angle);
+			v.v[1] = r * angularVelocity * std::cos(angle);
+
+			p += v * acceleration;
+			p.v[2] = 0;
+		}*/
+
+		p.v[0] = c.v[0] + std::cos(angle) * r;
+		p.v[1] = c.v[1] + std::sin(angle) * r;
+		p.v[2] = c.v[2];
+
 
 		///
 		/// ↑更新処理ここまで
@@ -175,8 +201,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 		DrawGrid(camera->GetCamera());
 
-		DrawSphere(Sphere{ .center = ball.position,.radius = 0.05f }, camera->GetCamera(), ball.color, 20);
-		DrawLine(spring.anchor, ball.position, camera->GetCamera(), WHITE);
+		DrawSphere(Sphere{ .center = p,.radius = 0.05f }, camera->GetCamera(), 0x0000FFFF, 20);
+		DrawSphere(Sphere{ .center = c,.radius = 0.05f }, camera->GetCamera(), 0x0000FFFF, 20);
+		//DrawLine(spring.anchor, ball.position, camera->GetCamera(), WHITE);
 
 		/*DrawSphere(Sphere{ .center = worldPS,.radius = 0.1f }, camera->GetCamera(), 0xFF0000FF, 10);
 		DrawSphere(Sphere{ .center = worldPE,.radius = 0.1f }, camera->GetCamera(), 0x00FF00FF, 10);
@@ -192,13 +219,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::Begin("Window");
 		if (ImGui::Button("Start")) {
 			isStart = true;
-			ball.position = { 1.2f,0.0f,0.0f };
-			ball.acceleration = { 0.0f,0.0f,0.0f };
-			ball.velocity = ball.acceleration;
 		}
 		if (ImGui::Button("Stop")) {
 			isStart = false;
 		}
+		ImGui::DragFloat3("p", p.v);
 		/*ImGui::DragFloat3("translates0", translates[0].v, 0.1f);
 		ImGui::DragFloat3("rotates0", rotates[0].v, 0.1f);
 		ImGui::DragFloat3("scales0", scales[0].v, 0.1f);
