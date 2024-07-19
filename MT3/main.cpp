@@ -31,13 +31,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		.stiffness = 100.0f,
 		.dampingCoeffient = 2.0f
 	};
-
-	Ball ball{
-		.position = {0.8f,0.2f,0.0f},
-		.mass = 2.0f,
-		.radius = 0.05f,
-		.color = BLUE
-	};*/
+*/
 
 	float deltaTime = 1.0f / 60.0f;
 	const Vector3Array kGravity{ 0.0f,-9.8f,0.0f };
@@ -52,12 +46,29 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	bool isStart = false;
 
-	Pendulum pendulum{
+	/*Pendulum pendulum{
 		.anchor = {0.0f,1.0f,0.0f},
 		.length = 0.8f,
 		.angle = 0.7f,
 		.angularVelocity = 0.0f,
 		.angularAcceleration = 0.0f
+	};*/
+
+	ConicalPendulum conicalPendulum;
+
+	conicalPendulum = {
+		.anchor = {0.0f,1.0f,0.0f},
+		.length = 0.8f,
+		.halfApexAngle = 0.7f,
+		.angle = 0.0f,
+		.angularVelocity = 0.0f
+	};
+
+	Ball ball{
+		.position = {0.8f,0.2f,0.0f},
+		.mass = 2.0f,
+		.radius = 0.05f,
+		.color = BLUE
 	};
 
 	/*Vector3Array translates[3] = {
@@ -184,12 +195,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		Vector3Array p = { 0,0,0 };
 		if (isStart) {
-			pendulum.angularAcceleration = -(9.8f / pendulum.length) * std::sin(pendulum.angle);
+			/*pendulum.angularAcceleration = -(9.8f / pendulum.length) * std::sin(pendulum.angle);
 			pendulum.angularVelocity += pendulum.angularAcceleration * deltaTime;
 			pendulum.angle += pendulum.angularVelocity * deltaTime;
 			p.v[0] = pendulum.anchor.v[0] + std::sin(pendulum.angle) * pendulum.length;
 			p.v[1] = pendulum.anchor.v[1] - std::cos(pendulum.angle) * pendulum.length;
-			p.v[2] = pendulum.anchor.v[2];
+			p.v[2] = pendulum.anchor.v[2];*/
+
+			conicalPendulum.angularVelocity = std::sqrtf(9.8f / (conicalPendulum.length * std::cosf(conicalPendulum.halfApexAngle)));
+			conicalPendulum.angle += conicalPendulum.angularVelocity * deltaTime;
+
+			float radius = std::sin(conicalPendulum.halfApexAngle) * conicalPendulum.length;
+			float height = std::cos(conicalPendulum.halfApexAngle) * conicalPendulum.length;
+			ball.position.v[0] = conicalPendulum.anchor.v[0] + std::cosf(conicalPendulum.angle) * radius;
+			ball.position.v[1] = conicalPendulum.anchor.v[1] - height;
+			ball.position.v[2] = conicalPendulum.anchor.v[2] + std::sinf(conicalPendulum.angle) * radius;
+			p = ball.position;
 		}
 		/*if (isStart) {
 			Vector3Array v;
@@ -214,7 +235,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		DrawGrid(camera->GetCamera());
 
 		DrawSphere(Sphere{ .center = p,.radius = 0.05f }, camera->GetCamera(), 0x0000FFFF, 20);
-		DrawLine(pendulum.anchor, p, camera->GetCamera(), WHITE);
+		DrawLine(conicalPendulum.anchor, p, camera->GetCamera(), WHITE);
 
 		/*DrawSphere(Sphere{ .center = worldPS,.radius = 0.1f }, camera->GetCamera(), 0xFF0000FF, 10);
 		DrawSphere(Sphere{ .center = worldPE,.radius = 0.1f }, camera->GetCamera(), 0x00FF00FF, 10);
