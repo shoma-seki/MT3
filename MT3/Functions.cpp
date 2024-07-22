@@ -1003,6 +1003,13 @@ Vector3Array Lerp(const Vector3Array& v1, const Vector3Array& v2, float t)
 	return result;
 }
 
+Vector3Array Reflect(const Vector3Array& input, const Vector3Array& normal)
+{
+	Vector3Array reflect;
+	reflect = Subtract(input, Multiply(2.0f, Multiply(Dot(input, normal), normal)));
+	return reflect;
+}
+
 Vector3Array Cross(const Vector3Array& v1, const Vector3Array& v2) {
 	Vector3Array result;
 	result.v[0] = v1.v[1] * v2.v[2] - v1.v[2] * v2.v[1];

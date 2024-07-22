@@ -117,3 +117,4 @@ void DrawBezier(const Vector3Array& controlPoint0, const Vector3Array& controlPo
 Vector3Array CatmullRom(Vector3Array p[4], float t, int nowPoint, int pointMin, int pointMax);
 void DrawCatmullRom(Vector3Array p[4], const Camera3dData& camera, uint32_t color);
 Vector3Array Lerp(const Vector3Array& v1, const Vector3Array& v2, float t);
+Vector3Array Reflect(const Vector3Array& input, const Vector3Array& normal);
