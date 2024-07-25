@@ -65,7 +65,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//};
 
 	Ball ball{
-		.position = {0.8f,1.0f,0.1f},
+		.position = {0.8f,1.2f,0.3f},
 		.acceleration = {0.0f,-9.8f,0.0f},
 		.mass = 2.0f,
 		.radius = 0.05f,
@@ -75,7 +75,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Ball startBall = ball;
 
 	Plane plane{
-		.normal = {0.2f,0.9f,0.2f},
+		.normal = {-0.2f,0.9f,-0.3f},
 		.distance = 0.0f
 	};
 
